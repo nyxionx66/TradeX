@@ -1,0 +1,51 @@
+# Example miscellaneous item configuration
+teleport_pearl:
+  material: ENDER_PEARL
+  name: "<gradient:#9370DB:#4B0082>Teleport Pearl</gradient>"
+  lore:
+    - "&7Right-click to teleport"
+    - "&7No fall damage"
+    - ""
+    - "&5&lMAGICAL ITEM"
+  unbreakable: false
+  use-vanilla-lore: false
+  enchants:
+    KNOCKBACK: 1
+  disable-use: false
+  nbt-id: "teleport_pearl"
+  custom-nbt:
+    teleport_range: 100
+    no_fall_damage: true
+
+healing_potion:
+  material: POTION
+  name: "<gradient:#FF1493:#FF69B4>Greater Healing Potion</gradient>"
+  lore:
+    - "&dRestores full health instantly"
+    - "&7Brewed by master alchemists"
+    - ""
+    - "&d&lHEALING POTION"
+  unbreakable: false
+  use-vanilla-lore: false
+  enchants: {}
+  disable-use: false
+  nbt-id: "healing_potion"
+  custom-nbt:
+    healing_amount: 20
+    instant_heal: true
+
+disabled_item:
+  material: BARRIER
+  name: "<red>Disabled Item</red>"
+  lore:
+    - "&cThis item cannot be used"
+    - "&7Interaction is disabled"
+    - ""
+    - "&c&lDISABLED"
+  unbreakable: true
+  use-vanilla-lore: false
+  enchants: {}
+  disable-use: true
+  nbt-id: "disabled_item"
+  custom-nbt:
+    disabled: true

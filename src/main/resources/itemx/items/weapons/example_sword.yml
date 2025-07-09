@@ -1,0 +1,45 @@
+# Example weapon item configuration
+legendary_sword:
+  material: DIAMOND_SWORD
+  name: "<gradient:#FF0000:#0000FF>Legendary Sword</gradient>"
+  lore:
+    - "&7A powerful weapon forged in"
+    - "<gradient:#FFD700:#FF4500>ancient fires</gradient>"
+    - ""
+    - "&eAbilities:"
+    - "&7• Deals extra damage"
+    - "&7• Unbreakable"
+    - ""
+    - "&6&lLEGENDARY"
+  unbreakable: true
+  use-vanilla-lore: false
+  enchants:
+    SHARPNESS: 10
+    FIRE_ASPECT: 3
+    LOOTING: 5
+  disable-use: false
+  nbt-id: "legendary_sword"
+  custom-nbt:
+    power_level: 100
+    rarity: "legendary"
+    creator: "ItemX"
+
+flaming_blade:
+  material: NETHERITE_SWORD
+  name: "<gradient:#FF4500:#FF0000>Flaming Blade</gradient>"
+  lore:
+    - "&cIgnites enemies with each strike"
+    - "&7Forged in the depths of the Nether"
+    - ""
+    - "&c&lFIRE DAMAGE"
+  unbreakable: true
+  use-vanilla-lore: false
+  enchants:
+    FIRE_ASPECT: 5
+    SHARPNESS: 8
+    UNBREAKING: 10
+  disable-use: false
+  nbt-id: "flaming_blade"
+  custom-nbt:
+    fire_damage: 5
+    burn_duration: 10
