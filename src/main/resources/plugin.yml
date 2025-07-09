@@ -1,0 +1,35 @@
+name: ProTrades
+version: '1.0.0'
+main: org.mindle.protrades.ProTrades
+api-version: '1.21'
+author: Mindle
+description: In-Game, GUI-Based Trade System Creator
+website: https://mindle.org
+
+commands:
+  protrades:
+    description: Main ProTrades admin command
+    aliases: [pt]
+    permission: protrades.admin
+    usage: /protrades <create|delete|edit|list|reload> [args]
+  trade:
+    description: Open a trade GUI
+    permission: protrades.trade
+    usage: /trade <id>
+  ptnbt:
+    description: ProTrades NBT management command
+    permission: protrades.admin
+    usage: /ptnbt <info|debug|stats|cache|validate|help> [args]
+
+permissions:
+  protrades.admin:
+    description: Allows access to all ProTrades admin commands
+    default: op
+  protrades.trade:
+    description: Allows access to trade command
+    default: true
+    children:
+      protrades.trade.*: true
+  protrades.trade.*:
+    description: Allows access to all trade GUIs
+    default: true
