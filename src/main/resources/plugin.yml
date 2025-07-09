@@ -3,7 +3,7 @@ version: '1.0.0'
 main: org.mindle.protrades.ProTrades
 api-version: '1.21'
 author: Mindle
-description: In-Game, GUI-Based Trade System Creator
+description: In-Game, GUI-Based Trade System Creator with ItemX Custom Items
 website: https://mindle.org
 
 commands:
@@ -20,6 +20,10 @@ commands:
     description: ProTrades NBT management command
     permission: protrades.admin
     usage: /ptnbt <info|debug|stats|cache|validate|help> [args]
+  itemx:
+    description: ItemX custom items command
+    permission: itemx.use
+    usage: /itemx <give|get|reload> [args]
 
 permissions:
   protrades.admin:
@@ -33,3 +37,18 @@ permissions:
   protrades.trade.*:
     description: Allows access to all trade GUIs
     default: true
+  itemx.use:
+    description: Allows access to basic ItemX commands
+    default: true
+    children:
+      itemx.give: true
+      itemx.get: true
+  itemx.give:
+    description: Allows giving ItemX items to players
+    default: op
+  itemx.get:
+    description: Allows getting ItemX items for yourself
+    default: true
+  itemx.reload:
+    description: Allows reloading ItemX configuration
+    default: op
