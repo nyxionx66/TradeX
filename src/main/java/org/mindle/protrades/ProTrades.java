@@ -94,6 +94,29 @@ public final class ProTrades extends JavaPlugin {
         }
     }
 
+    /**
+     * Loads the ItemX configuration file.
+     */
+    private void loadItemXConfig() {
+        try {
+            File itemXConfigFile = new File(getDataFolder(), "itemx-config.yml");
+            if (!itemXConfigFile.exists()) {
+                saveResource("itemx-config.yml", false);
+            }
+            
+            // Merge ItemX config with main config
+            org.bukkit.configuration.file.YamlConfiguration itemXConfig = 
+                org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(itemXConfigFile);
+            
+            // Add ItemX configuration to main config
+            getConfig().set("itemx", itemXConfig.getConfigurationSection(""));
+            
+            getLogger().info("ItemX configuration loaded successfully");
+        } catch (Exception e) {
+            getLogger().log(Level.WARNING, "Failed to load ItemX configuration", e);
+        }
+    }
+
     public static ProTrades getInstance() {
         return instance;
     }
@@ -112,6 +135,10 @@ public final class ProTrades extends JavaPlugin {
 
     public NBTManager getNBTManager() {
         return nbtManager;
+    }
+
+    public ItemManager getItemManager() {
+        return itemManager;
     }
 
     /**
