@@ -3,6 +3,8 @@ package org.mindle.protrades;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.mindle.protrades.commands.ProTradesCommand;
 import org.mindle.protrades.commands.TradeCommand;
+import org.mindle.protrades.itemx.ItemManager;
+import org.mindle.protrades.itemx.commands.ItemXCommand;
 import org.mindle.protrades.listeners.InventoryClickListener;
 import org.mindle.protrades.managers.ConfigManager;
 import org.mindle.protrades.managers.GUIManager;
@@ -19,6 +21,7 @@ public final class ProTrades extends JavaPlugin {
     private GUIManager guiManager;
     private ConfigManager configManager;
     private NBTManager nbtManager;
+    private ItemManager itemManager;
 
     @Override
     public void onEnable() {
