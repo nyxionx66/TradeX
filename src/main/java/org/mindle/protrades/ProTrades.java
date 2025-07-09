@@ -28,6 +28,9 @@ public final class ProTrades extends JavaPlugin {
         try {
             instance = this;
             
+            // Load default configuration
+            saveDefaultConfig();
+            
             // Create trades directory if it doesn't exist
             File tradesDir = new File(getDataFolder(), "trades");
             if (!tradesDir.exists()) {
@@ -39,25 +42,36 @@ public final class ProTrades extends JavaPlugin {
             this.nbtManager = new NBTManager(this);
             this.tradeManager = new TradeManager(this, configManager);
             this.guiManager = new GUIManager(this, tradeManager);
+            
+            // Initialize ItemX system
+            this.itemManager = new ItemManager(this);
+            
+            // Load configurations
+            loadItemXConfig();
 
             // Register commands
             var ProTradesCommand = new ProTradesCommand(this, tradeManager, guiManager);
             var tradeCommand = new TradeCommand(this, tradeManager, guiManager);
             var nbtCommand = new org.mindle.protrades.commands.NBTCommand(this, tradeManager);
+            var itemXCommand = new ItemXCommand(this, itemManager);
             
             getCommand("protrades").setExecutor(ProTradesCommand);
             getCommand("trade").setExecutor(tradeCommand);
             getCommand("ptnbt").setExecutor(nbtCommand);
             getCommand("ptnbt").setTabCompleter(nbtCommand);
+            getCommand("itemx").setExecutor(itemXCommand);
+            getCommand("itemx").setTabCompleter(itemXCommand);
 
             // Register listeners
             getServer().getPluginManager().registerEvents(new InventoryClickListener(this, tradeManager, guiManager), this);
             getServer().getPluginManager().registerEvents(new org.mindle.protrades.listeners.NBTTradeListener(this), this);
 
-            // Load all trades
+            // Load all trades and items
             tradeManager.loadAllTrades();
+            itemManager.loadAllItems();
 
             getLogger().info("ProTrades has been enabled successfully with NBT support!");
+            getLogger().info("ItemX system: ENABLED");
             getLogger().info("ProItems integration: " + (isProItemsInstalled() ? "ENABLED" : "DISABLED"));
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, "Failed to enable ProTrades", e);
