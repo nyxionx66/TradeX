@@ -248,9 +248,7 @@ public final class ProTrades extends JavaPlugin {
         
         stats.put("version", getDescription().getVersion());
         stats.put("enabled", isEnabled());
-        stats.put("items", itemManager.getStatistics());
-        stats.put("templates", templateManager.getStatistics());
-        stats.put("trades", tradeManager.getAllTradeIds().size());
+        stats.put("trades", tradeManager.getAllTradeGUIIds().size());
         stats.put("proitems_integration", isProItemsInstalled());
         
         return stats;
