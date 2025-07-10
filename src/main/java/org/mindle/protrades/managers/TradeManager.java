@@ -524,7 +524,81 @@ public class TradeManager {
     }
 
     /**
+     * Verifies the integrity of a trade by comparing original and processed versions.
+     * 
+     * @param original The original trade
+     * @param processed The processed trade
+     * @return true if the trades are identical, false otherwise
+     */
+    private boolean verifyTradeIntegrity(Trade original, Trade processed) {
+        if (original == null || processed == null) {
+            return false;
+        }
+        
+        // Verify inputs
+        if (original.inputs().size() != processed.inputs().size()) {
+            return false;
+        }
+        
+        for (int i = 0; i < original.inputs().size(); i++) {
+            ItemStack originalInput = original.inputs().get(i);
+            ItemStack processedInput = processed.inputs().get(i);
+            
+            if (!ItemUtils.verifyCloneIntegrity(originalInput, processedInput)) {
+                return false;
+            }
+        }
+        
+        // Verify output
+        return ItemUtils.verifyCloneIntegrity(original.output(), processed.output());
+    }
+
+    /**
+     * Gets statistics about ultra cloning usage in trades.
+     * 
+     * @return Map containing ultra cloning statistics
+     */
+    public Map<String, Integer> getUltraCloningStatistics() {
+        Map<String, Integer> stats = new HashMap<>();
+        int totalTrades = 0;
+        int tradesWithUltraClones = 0;
+        int totalUltraClones = 0;
+        
+        for (Map<String, Trade> guiTrades : tradeGUIs.values()) {
+            for (Trade trade : guiTrades.values()) {
+                totalTrades++;
+                boolean tradeHasUltraClones = false;
+                
+                // Check input items
+                for (ItemStack input : trade.inputs()) {
+                    if (ItemUtils.isUltraClone(input)) {
+                        totalUltraClones++;
+                        tradeHasUltraClones = true;
+                    }
+                }
+                
+                // Check output item
+                if (ItemUtils.isUltraClone(trade.output())) {
+                    totalUltraClones++;
+                    tradeHasUltraClones = true;
+                }
+                
+                if (tradeHasUltraClones) {
+                    tradesWithUltraClones++;
+                }
+            }
+        }
+        
+        stats.put("totalTrades", totalTrades);
+        stats.put("tradesWithUltraClones", tradesWithUltraClones);
+        stats.put("totalUltraClones", totalUltraClones);
+        
+        return stats;
+    }
+
+    /**
      * Gets statistics about NBT usage in trades.
+     * Enhanced with ultra cloning statistics.
      * 
      * @return Map containing NBT usage statistics
      */
@@ -534,6 +608,7 @@ public class TradeManager {
         int tradesWithNBT = 0;
         int itemsWithNBT = 0;
         int totalItems = 0;
+        int ultraClones = 0;
         
         for (Map<String, Trade> guiTrades : tradeGUIs.values()) {
             for (Trade trade : guiTrades.values()) {
@@ -547,6 +622,9 @@ public class TradeManager {
                         itemsWithNBT++;
                         tradeHasNBT = true;
                     }
+                    if (ItemUtils.isUltraClone(input)) {
+                        ultraClones++;
+                    }
                 }
                 
                 // Check output item
@@ -554,6 +632,9 @@ public class TradeManager {
                 if (ItemUtils.hasCustomNBT(trade.output())) {
                     itemsWithNBT++;
                     tradeHasNBT = true;
+                }
+                if (ItemUtils.isUltraClone(trade.output())) {
+                    ultraClones++;
                 }
                 
                 if (tradeHasNBT) {
@@ -566,6 +647,7 @@ public class TradeManager {
         stats.put("tradesWithNBT", tradesWithNBT);
         stats.put("totalItems", totalItems);
         stats.put("itemsWithNBT", itemsWithNBT);
+        stats.put("ultraClones", ultraClones);
         
         return stats;
     }
