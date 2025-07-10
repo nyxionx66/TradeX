@@ -182,15 +182,10 @@ public final class ProTrades extends JavaPlugin {
     private void logSuccessfulStartup() {
         getLogger().info("=== ProTrades Enabled Successfully ===");
         getLogger().info("Version: " + getDescription().getVersion());
-        getLogger().info("ItemX System: ENABLED");
-        getLogger().info("Trade Templates: ENABLED");
-        getLogger().info("Dynamic Trade Creation: ENABLED");
+        getLogger().info("Trade System: ENABLED");
         getLogger().info("NBT Support: ENABLED");
         getLogger().info("ProItems Integration: " + (isProItemsInstalled() ? "ENABLED" : "DISABLED"));
-        getLogger().info("Resource Structure: NEW (Organized)");
-        getLogger().info("Items Loaded: " + itemManager.getAllItemIds().size());
-        getLogger().info("Templates Loaded: " + templateManager.getAllTemplateIds().size());
-        getLogger().info("Trades Loaded: " + tradeManager.getAllTradeIds().size());
+        getLogger().info("Trades Loaded: " + tradeManager.getAllTradeGUIIds().size());
         getLogger().info("=====================================");
     }
 
