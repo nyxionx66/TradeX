@@ -183,6 +183,7 @@ public final class ProTrades extends JavaPlugin {
         getLogger().info("=== ProTrades Enabled Successfully ===");
         getLogger().info("Version: " + getDescription().getVersion());
         getLogger().info("Trade System: ENABLED");
+        getLogger().info("Ultra Cloning System: ENABLED");
         getLogger().info("NBT Support: ENABLED");
         getLogger().info("ProItems Integration: " + (isProItemsInstalled() ? "ENABLED" : "DISABLED"));
         getLogger().info("Trades Loaded: " + tradeManager.getAllTradeGUIIds().size());
