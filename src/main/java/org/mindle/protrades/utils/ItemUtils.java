@@ -361,12 +361,18 @@ public class ItemUtils {
     /**
      * Creates a trading-safe copy of an ItemStack with full NBT preservation.
      * This method ensures that all NBT data, including ProItems data, is preserved.
+     * Uses the ultra cloning system for maximum reliability.
      * 
      * @param original The original ItemStack
      * @return A trading-safe copy
      */
     public static ItemStack createTradingSafeCopy(ItemStack original) {
-        return NBTUtils.createTradingSafeCopy(original);
+        if (original == null) {
+            return null;
+        }
+        
+        // Use ultra cloning system for maximum data preservation
+        return CloningUtils.createTradeSafeClone(original);
     }
 
     /**
