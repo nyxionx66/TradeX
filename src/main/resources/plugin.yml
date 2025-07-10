@@ -24,6 +24,10 @@ commands:
     description: ItemX custom items command
     permission: itemx.use
     usage: /itemx <give <item-id> [player]|get category:<category-name>|reload>
+  trademgmt:
+    description: Advanced trade management with templates and GUI creation
+    permission: protrades.admin
+    usage: /trademgmt <create|template|gui|list|apply|reload|stats> [args]
 
 permissions:
   protrades.admin:
