@@ -458,7 +458,7 @@ public class GUIManager {
         }
 
         if (inputs.size() >= 2 && inputs.get(1) != null) {
-            inventory.setItem(INPUT_SLOT_2, inputs.get(1).clone());
+            inventory.setItem(INPUT_SLOT_2, ItemUtils.createDisplayClone(inputs.get(1)));
         } else {
             inventory.setItem(INPUT_SLOT_2, createEnhancedInputSlot(2));
         }
