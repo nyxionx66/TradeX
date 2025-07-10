@@ -394,4 +394,110 @@ public class ItemUtils {
     public static String getDebugNBTInfo(ItemStack item) {
         return NBTUtils.getDebugNBTInfo(item);
     }
+
+    /**
+     * Creates a perfect clone of an ItemStack using the ultra cloning system.
+     * This method guarantees that absolutely no data is lost during cloning.
+     * 
+     * @param original The original ItemStack to clone
+     * @return A perfect clone with all data preserved
+     */
+    public static ItemStack createPerfectClone(ItemStack original) {
+        if (original == null) {
+            return null;
+        }
+        
+        return CloningUtils.ultraClone(original);
+    }
+
+    /**
+     * Creates a perfect clone of a list of ItemStacks.
+     * 
+     * @param originals The list of original ItemStacks
+     * @return A list of perfect clones
+     */
+    public static List<ItemStack> createPerfectCloneList(List<ItemStack> originals) {
+        if (originals == null || originals.isEmpty()) {
+            return new ArrayList<>();
+        }
+        
+        return CloningUtils.ultraCloneList(originals);
+    }
+
+    /**
+     * Creates a display-safe clone of an ItemStack for GUI usage.
+     * This method ensures the clone is suitable for inventory display.
+     * 
+     * @param original The original ItemStack
+     * @return A display-safe clone
+     */
+    public static ItemStack createDisplayClone(ItemStack original) {
+        if (original == null) {
+            return null;
+        }
+        
+        return CloningUtils.createDisplayClone(original);
+    }
+
+    /**
+     * Creates a storage-safe clone of an ItemStack for persistent storage.
+     * This method ensures the clone is suitable for saving to files/databases.
+     * 
+     * @param original The original ItemStack
+     * @return A storage-safe clone
+     */
+    public static ItemStack createStorageClone(ItemStack original) {
+        if (original == null) {
+            return null;
+        }
+        
+        return CloningUtils.createStorageClone(original);
+    }
+
+    /**
+     * Verifies that a cloned item is identical to the original.
+     * 
+     * @param original The original ItemStack
+     * @param clone The clone to verify
+     * @return true if the clone is identical, false otherwise
+     */
+    public static boolean verifyCloneIntegrity(ItemStack original, ItemStack clone) {
+        if (original == null && clone == null) {
+            return true;
+        }
+        
+        if (original == null || clone == null) {
+            return false;
+        }
+        
+        return CloningUtils.verifyCloneIntegrity(original, clone);
+    }
+
+    /**
+     * Checks if an ItemStack was created using the ultra cloning system.
+     * 
+     * @param item The item to check
+     * @return true if it's an ultra clone, false otherwise
+     */
+    public static boolean isUltraClone(ItemStack item) {
+        if (item == null) {
+            return false;
+        }
+        
+        return CloningUtils.isUltraClone(item);
+    }
+
+    /**
+     * Gets the timestamp when an item was cloned (if it's an ultra clone).
+     * 
+     * @param item The item to check
+     * @return The clone timestamp, or -1 if not a clone
+     */
+    public static long getCloneTimestamp(ItemStack item) {
+        if (item == null) {
+            return -1;
+        }
+        
+        return CloningUtils.getCloneTimestamp(item);
+    }
 }
