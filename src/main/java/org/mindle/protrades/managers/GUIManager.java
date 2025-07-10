@@ -237,7 +237,8 @@ public class GUIManager {
      * Creates a reorderable trade item for the reorder GUI.
      */
     private ItemStack createReorderableTradeItem(Trade trade, int position) {
-        ItemStack displayItem = trade.output().clone();
+        // Create display item using ultra cloning system for perfect preservation
+        ItemStack displayItem = ItemUtils.createDisplayClone(trade.output());
         ItemMeta meta = displayItem.getItemMeta();
         if (meta == null) return displayItem;
 
