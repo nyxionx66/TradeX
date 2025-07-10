@@ -160,8 +160,6 @@ public final class ProTrades extends JavaPlugin {
         
         // Load system data
         tradeManager.loadAllTrades();
-        itemManager.loadAllItems();
-        templateManager.loadAllTemplates();
         
         getLogger().info("Loaded all configurations successfully");
     }
