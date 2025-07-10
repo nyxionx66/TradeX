@@ -17,6 +17,10 @@ import org.mindle.protrades.nbt.NBTManager;
 import java.io.File;
 import java.util.logging.Level;
 
+/**
+ * Enhanced ProTrades plugin with streamlined resource management.
+ * Now supports the new organized resource structure with improved performance.
+ */
 public final class ProTrades extends JavaPlugin {
 
     private static ProTrades instance;
@@ -33,59 +37,30 @@ public final class ProTrades extends JavaPlugin {
         try {
             instance = this;
             
-            // Load default configuration
+            // Load and save default configuration
             saveDefaultConfig();
             
-            // Create trades directory if it doesn't exist
-            File tradesDir = new File(getDataFolder(), "trades");
-            if (!tradesDir.exists()) {
-                tradesDir.mkdirs();
-            }
+            // Create required directories
+            createDirectories();
 
-            // Initialize managers
-            this.configManager = new ConfigManager(this);
-            this.nbtManager = new NBTManager(this);
-            this.tradeManager = new TradeManager(this, configManager);
-            this.guiManager = new GUIManager(this, tradeManager);
+            // Initialize managers in proper order
+            initializeManagers();
             
-            // Initialize ItemX system
-            this.itemManager = new ItemManager(this);
-            this.templateManager = new TradeTemplateManager(this, itemManager);
-            this.tradeCreationGUI = new TradeCreationGUI(this, itemManager);
-            
-            // Load configurations
-            loadItemXConfig();
-
             // Register commands
-            var ProTradesCommand = new ProTradesCommand(this, tradeManager, guiManager);
-            var tradeCommand = new TradeCommand(this, tradeManager, guiManager);
-            var nbtCommand = new org.mindle.protrades.commands.NBTCommand(this, tradeManager);
-            var itemXCommand = new ItemXCommand(this, itemManager);
-            var tradeMgmtCommand = new TradeManagementCommand(this, templateManager, tradeCreationGUI);
+            registerCommands();
+
+            // Register event listeners
+            registerListeners();
+
+            // Load configurations and data
+            loadConfigurations();
+
+            // Validate system
+            validateSystem();
+
+            // Success message
+            logSuccessfulStartup();
             
-            getCommand("protrades").setExecutor(ProTradesCommand);
-            getCommand("trade").setExecutor(tradeCommand);
-            getCommand("ptnbt").setExecutor(nbtCommand);
-            getCommand("ptnbt").setTabCompleter(nbtCommand);
-            getCommand("itemx").setExecutor(itemXCommand);
-            getCommand("itemx").setTabCompleter(itemXCommand);
-            getCommand("trademgmt").setExecutor(tradeMgmtCommand);
-            getCommand("trademgmt").setTabCompleter(tradeMgmtCommand);
-
-            // Register listeners
-            getServer().getPluginManager().registerEvents(new InventoryClickListener(this, tradeManager, guiManager), this);
-            getServer().getPluginManager().registerEvents(new org.mindle.protrades.listeners.NBTTradeListener(this), this);
-
-            // Load all trades and items
-            tradeManager.loadAllTrades();
-            itemManager.loadAllItems();
-            templateManager.loadAllTemplates();
-
-            getLogger().info("ProTrades has been enabled successfully with NBT support!");
-            getLogger().info("ItemX system: ENABLED");
-            getLogger().info("Trade Templates: ENABLED");
-            getLogger().info("Dynamic Trade Creation: ENABLED");
-            getLogger().info("ProItems integration: " + (isProItemsInstalled() ? "ENABLED" : "DISABLED"));
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, "Failed to enable ProTrades", e);
             getServer().getPluginManager().disablePlugin(this);
@@ -95,12 +70,16 @@ public final class ProTrades extends JavaPlugin {
     @Override
     public void onDisable() {
         try {
+            // Save all data before shutdown
             if (tradeManager != null) {
                 tradeManager.saveAllTrades();
             }
+            
+            // Clear caches
             if (nbtManager != null) {
                 nbtManager.clearCache();
             }
+            
             getLogger().info("ProTrades has been disabled successfully!");
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, "Error during plugin disable", e);
@@ -108,18 +87,187 @@ public final class ProTrades extends JavaPlugin {
     }
 
     /**
-     * Loads the ItemX configuration from the main config file.
+     * Creates all required directories for the new structure.
      */
-    private void loadItemXConfig() {
+    private void createDirectories() {
+        // Create main directories
+        File dataFolder = getDataFolder();
+        if (!dataFolder.exists()) {
+            dataFolder.mkdirs();
+        }
+        
+        // Create configs directory structure
+        File configsDir = new File(dataFolder, "configs");
+        if (!configsDir.exists()) {
+            configsDir.mkdirs();
+        }
+        
+        File tradesDir = new File(configsDir, "trades");
+        if (!tradesDir.exists()) {
+            tradesDir.mkdirs();
+        }
+        
+        File templatesDir = new File(configsDir, "templates");
+        if (!templatesDir.exists()) {
+            templatesDir.mkdirs();
+        }
+        
+        // Create items directory structure
+        File itemsDir = new File(dataFolder, "items");
+        if (!itemsDir.exists()) {
+            itemsDir.mkdirs();
+        }
+        
+        // Create category directories
+        String[] categories = {"weapons", "armor", "tools", "misc"};
+        for (String category : categories) {
+            File categoryDir = new File(itemsDir, category);
+            if (!categoryDir.exists()) {
+                categoryDir.mkdirs();
+            }
+        }
+        
+        getLogger().info("Created directory structure successfully");
+    }
+
+    /**
+     * Initializes all managers in the correct order.
+     */
+    private void initializeManagers() {
+        // Core managers
+        this.configManager = new ConfigManager(this);
+        this.nbtManager = new NBTManager(this);
+        
+        // Trade system managers
+        this.tradeManager = new TradeManager(this, configManager);
+        this.guiManager = new GUIManager(this, tradeManager);
+        
+        // ItemX system managers
+        this.itemManager = new ItemManager(this);
+        this.templateManager = new TradeTemplateManager(this, itemManager);
+        this.tradeCreationGUI = new TradeCreationGUI(this, itemManager);
+        
+        getLogger().info("Initialized all managers successfully");
+    }
+
+    /**
+     * Registers all commands with their executors and tab completers.
+     */
+    private void registerCommands() {
+        // Create command instances
+        var proTradesCommand = new ProTradesCommand(this, tradeManager, guiManager);
+        var tradeCommand = new TradeCommand(this, tradeManager, guiManager);
+        var nbtCommand = new org.mindle.protrades.commands.NBTCommand(this, tradeManager);
+        var itemXCommand = new ItemXCommand(this, itemManager);
+        var tradeMgmtCommand = new TradeManagementCommand(this, templateManager, tradeCreationGUI);
+        
+        // Register commands
+        getCommand("protrades").setExecutor(proTradesCommand);
+        getCommand("trade").setExecutor(tradeCommand);
+        getCommand("ptnbt").setExecutor(nbtCommand);
+        getCommand("ptnbt").setTabCompleter(nbtCommand);
+        getCommand("itemx").setExecutor(itemXCommand);
+        getCommand("itemx").setTabCompleter(itemXCommand);
+        getCommand("trademgmt").setExecutor(tradeMgmtCommand);
+        getCommand("trademgmt").setTabCompleter(tradeMgmtCommand);
+        
+        getLogger().info("Registered all commands successfully");
+    }
+
+    /**
+     * Registers all event listeners.
+     */
+    private void registerListeners() {
+        getServer().getPluginManager().registerEvents(
+            new InventoryClickListener(this, tradeManager, guiManager), this
+        );
+        getServer().getPluginManager().registerEvents(
+            new org.mindle.protrades.listeners.NBTTradeListener(this), this
+        );
+        
+        getLogger().info("Registered all event listeners successfully");
+    }
+
+    /**
+     * Loads all configurations and data.
+     */
+    private void loadConfigurations() {
+        // Load configurations
+        reloadConfig();
+        
+        // Load system data
+        tradeManager.loadAllTrades();
+        itemManager.loadAllItems();
+        templateManager.loadAllTemplates();
+        
+        getLogger().info("Loaded all configurations successfully");
+    }
+
+    /**
+     * Validates the system configuration and setup.
+     */
+    private void validateSystem() {
+        // Validate configuration structure
+        if (!configManager.validateConfiguration()) {
+            getLogger().warning("Configuration validation failed");
+        }
+        
+        // Validate items
+        if (!itemManager.validateAllItems()) {
+            getLogger().warning("Item validation failed");
+        }
+        
+        // Validate templates
+        if (!templateManager.validateAllTemplates()) {
+            getLogger().warning("Template validation failed");
+        }
+        
+        getLogger().info("System validation completed");
+    }
+
+    /**
+     * Logs successful startup information.
+     */
+    private void logSuccessfulStartup() {
+        getLogger().info("=== ProTrades Enabled Successfully ===");
+        getLogger().info("Version: " + getDescription().getVersion());
+        getLogger().info("ItemX System: ENABLED");
+        getLogger().info("Trade Templates: ENABLED");
+        getLogger().info("Dynamic Trade Creation: ENABLED");
+        getLogger().info("NBT Support: ENABLED");
+        getLogger().info("ProItems Integration: " + (isProItemsInstalled() ? "ENABLED" : "DISABLED"));
+        getLogger().info("Resource Structure: NEW (Organized)");
+        getLogger().info("Items Loaded: " + itemManager.getAllItemIds().size());
+        getLogger().info("Templates Loaded: " + templateManager.getAllTemplateIds().size());
+        getLogger().info("Trades Loaded: " + tradeManager.getAllTradeIds().size());
+        getLogger().info("=====================================");
+    }
+
+    /**
+     * Reloads the entire plugin configuration.
+     */
+    public void reloadPlugin() {
         try {
-            // ItemX configuration is now integrated into the main config.yml
-            // No separate loading needed - it's already part of the main config
-            getLogger().info("ItemX configuration loaded from main config");
+            getLogger().info("Reloading ProTrades configuration...");
+            
+            // Reload main config
+            reloadConfig();
+            
+            // Reload all managers
+            itemManager.reload();
+            templateManager.reload();
+            tradeManager.loadAllTrades();
+            
+            // Validate after reload
+            validateSystem();
+            
+            getLogger().info("ProTrades configuration reloaded successfully!");
         } catch (Exception e) {
-            getLogger().log(Level.WARNING, "Failed to load ItemX configuration", e);
+            getLogger().log(Level.SEVERE, "Error during configuration reload", e);
         }
     }
 
+    // Getters for all managers
     public static ProTrades getInstance() {
         return instance;
     }
@@ -158,5 +306,21 @@ public final class ProTrades extends JavaPlugin {
     public boolean isProItemsInstalled() {
         return getServer().getPluginManager().getPlugin("ProItems") != null &&
                getServer().getPluginManager().isPluginEnabled("ProItems");
+    }
+
+    /**
+     * Gets plugin statistics.
+     */
+    public Map<String, Object> getPluginStatistics() {
+        Map<String, Object> stats = new HashMap<>();
+        
+        stats.put("version", getDescription().getVersion());
+        stats.put("enabled", isEnabled());
+        stats.put("items", itemManager.getStatistics());
+        stats.put("templates", templateManager.getStatistics());
+        stats.put("trades", tradeManager.getAllTradeIds().size());
+        stats.put("proitems_integration", isProItemsInstalled());
+        
+        return stats;
     }
 }
