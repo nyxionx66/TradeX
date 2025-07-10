@@ -452,7 +452,7 @@ public class GUIManager {
         // Load existing trade data into input/output slots
         List<ItemStack> inputs = trade.inputs();
         if (inputs.size() >= 1 && inputs.get(0) != null) {
-            inventory.setItem(INPUT_SLOT_1, inputs.get(0).clone());
+            inventory.setItem(INPUT_SLOT_1, ItemUtils.createDisplayClone(inputs.get(0)));
         } else {
             inventory.setItem(INPUT_SLOT_1, createEnhancedInputSlot(1));
         }
