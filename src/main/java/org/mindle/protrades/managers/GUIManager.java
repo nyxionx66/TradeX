@@ -867,7 +867,8 @@ public class GUIManager {
      * Creates an enhanced trade display item with proper trade ID in lore, NBT information, and position.
      */
     private ItemStack createEnhancedTradeDisplay(Trade trade, int position) {
-        ItemStack displayItem = trade.output().clone();
+        // Create display item using ultra cloning system for perfect preservation
+        ItemStack displayItem = ItemUtils.createDisplayClone(trade.output());
         ItemMeta meta = displayItem.getItemMeta();
         if (meta == null) return displayItem;
 
