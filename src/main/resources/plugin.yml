@@ -23,7 +23,7 @@ commands:
   itemx:
     description: ItemX custom items command
     permission: itemx.use
-    usage: /itemx <give|get|reload> [args]
+    usage: /itemx <give <item-id> [player]|get category:<category-name>|reload>
 
 permissions:
   protrades.admin:
