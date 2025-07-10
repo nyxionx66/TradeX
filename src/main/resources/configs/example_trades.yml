@@ -1,0 +1,116 @@
+# Example Trade Configurations
+# These are example GUIs with pre-configured trades
+
+starter_shop:
+  title: "&2&lStarter Shop"
+  rows: 3
+  order: ["weapon_trade", "armor_trade", "tool_trade"]
+  trades:
+    weapon_trade:
+      input:
+        - "IRON_SWORD:1"
+        - "EMERALD:5"
+      output: "legendary_sword:1"
+    armor_trade:
+      input:
+        - "IRON_HELMET:1"
+        - "DIAMOND:8"
+      output: "dragon_helmet:1"
+    tool_trade:
+      input:
+        - "IRON_PICKAXE:1"
+        - "EMERALD:10"
+      output: "miners_pickaxe:1"
+
+advanced_shop:
+  title: "&6&lAdvanced Shop"
+  rows: 4
+  order: ["legendary_upgrade", "armor_set", "tool_master", "magical_items"]
+  trades:
+    legendary_upgrade:
+      input:
+        - "legendary_sword:1"
+        - "flaming_blade:1"
+        - "NETHER_STAR:2"
+      output: "thunder_hammer:1"
+    armor_set:
+      input:
+        - "dragon_helmet:1"
+        - "NETHERITE_CHESTPLATE:1"
+        - "DRAGON_EGG:1"
+      output: "dragon_chestplate:1"
+    tool_master:
+      input:
+        - "miners_pickaxe:1"
+        - "forest_axe:1"
+        - "BEACON:1"
+      output: "excavator_shovel:1"
+    magical_items:
+      input:
+        - "ENDER_PEARL:10"
+        - "AMETHYST_SHARD:20"
+      output: "teleport_pearl:5"
+
+endgame_shop:
+  title: "&c&lEndgame Shop"
+  rows: 6
+  order: ["ultimate_weapon", "perfect_armor", "master_tools", "transcendent_items", "infinite_supplies"]
+  trades:
+    ultimate_weapon:
+      input:
+        - "thunder_hammer:1"
+        - "dragon_chestplate:1"
+        - "mana_crystal:10"
+        - "DRAGON_EGG:5"
+      output: "legendary_sword:1"
+    perfect_armor:
+      input:
+        - "dragon_helmet:1"
+        - "dragon_chestplate:1"
+        - "NETHER_STAR:32"
+      output: "dragon_leggings:1"
+    master_tools:
+      input:
+        - "miners_pickaxe:1"
+        - "forest_axe:1"
+        - "excavator_shovel:1"
+        - "NETHERITE_BLOCK:10"
+      output: "farmers_hoe:1"
+    transcendent_items:
+      input:
+        - "teleport_pearl:25"
+        - "healing_potion:50"
+        - "mana_crystal:15"
+      output: "void_bag:1"
+    infinite_supplies:
+      input:
+        - "void_bag:1"
+        - "lucky_coin:5"
+        - "BEACON:3"
+      output: "teleport_pearl:100"
+
+vip_shop:
+  title: "&5&lVIP Exclusive Shop"
+  rows: 5
+  order: ["vip_weapon", "vip_armor", "vip_tools", "vip_special"]
+  trades:
+    vip_weapon:
+      input:
+        - "NETHERITE_SWORD:1"
+        - "EMERALD_BLOCK:5"
+      output: "legendary_sword:1"
+    vip_armor:
+      input:
+        - "NETHERITE_HELMET:1"
+        - "DRAGON_BREATH:10"
+      output: "dragon_helmet:1"
+    vip_tools:
+      input:
+        - "NETHERITE_PICKAXE:1"
+        - "ANCIENT_DEBRIS:8"
+      output: "miners_pickaxe:1"
+    vip_special:
+      input:
+        - "ENDER_PEARL:20"
+        - "GOLD_BLOCK:10"
+      output: "teleport_pearl:10"
