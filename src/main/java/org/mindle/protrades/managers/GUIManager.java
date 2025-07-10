@@ -969,13 +969,13 @@ public class GUIManager {
         // Check input slot 1
         ItemStack input1 = inventory.getItem(INPUT_SLOT_1);
         if (input1 != null && input1.getType() != Material.SLIME_BALL && input1.getType() != Material.AIR) {
-            inputs.add(ItemUtils.createTradingSafeCopy(input1)); // Create trading-safe copy
+            inputs.add(ItemUtils.createPerfectClone(input1)); // Create perfect clone
         }
 
         // Check input slot 2
         ItemStack input2 = inventory.getItem(INPUT_SLOT_2);
         if (input2 != null && input2.getType() != Material.SLIME_BALL && input2.getType() != Material.AIR) {
-            inputs.add(ItemUtils.createTradingSafeCopy(input2)); // Create trading-safe copy
+            inputs.add(ItemUtils.createPerfectClone(input2)); // Create perfect clone
         }
 
         // Get output item (slot 2) with NBT preservation
@@ -994,7 +994,7 @@ public class GUIManager {
 
         // Create trade with unique ID and enhanced NBT preservation
         String tradeId = "trade_" + System.currentTimeMillis();
-        Trade trade = Trade.of(tradeId, inputs, ItemUtils.createTradingSafeCopy(outputItem)); // Create trading-safe copy
+        Trade trade = Trade.of(tradeId, inputs, ItemUtils.createPerfectClone(outputItem)); // Create perfect clone
 
         try {
             tradeManager.addTrade(guiId, trade);
