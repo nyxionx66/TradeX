@@ -1,6 +1,8 @@
 package org.mindle.protrades.itemx;
 
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Registry;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.trim.ArmorTrim;
 import org.bukkit.inventory.meta.trim.TrimMaterial;
@@ -15,7 +17,7 @@ import java.util.Objects;
  * This class holds all the configuration data for a custom item.
  */
 public class ItemDefinition {
-    
+
     private final String id;
     private final Material material;
     private final String name;
@@ -27,11 +29,11 @@ public class ItemDefinition {
     private final String nbtId;
     private final ArmorTrimData armorTrim;
     private final Map<String, Object> customNBT;
-    
+
     public ItemDefinition(String id, Material material, String name, List<String> lore,
-                         boolean unbreakable, boolean useVanillaLore, Map<String, Integer> enchantments,
-                         boolean disableUse, String nbtId, ArmorTrimData armorTrim,
-                         Map<String, Object> customNBT) {
+                          boolean unbreakable, boolean useVanillaLore, Map<String, Integer> enchantments,
+                          boolean disableUse, String nbtId, ArmorTrimData armorTrim,
+                          Map<String, Object> customNBT) {
         this.id = Objects.requireNonNull(id, "Item ID cannot be null");
         this.material = Objects.requireNonNull(material, "Material cannot be null");
         this.name = name;
@@ -44,7 +46,7 @@ public class ItemDefinition {
         this.armorTrim = armorTrim;
         this.customNBT = customNBT != null ? Map.copyOf(customNBT) : Map.of();
     }
-    
+
     public String getId() { return id; }
     public Material getMaterial() { return material; }
     public String getName() { return name; }
@@ -56,14 +58,14 @@ public class ItemDefinition {
     public String getNbtId() { return nbtId; }
     public ArmorTrimData getArmorTrim() { return armorTrim; }
     public Map<String, Object> getCustomNBT() { return customNBT; }
-    
+
     /**
      * Checks if this item definition is valid.
      */
     public boolean isValid() {
         return id != null && !id.isBlank() && material != null && material != Material.AIR;
     }
-    
+
     /**
      * Gets the display name for this item, or the formatted material name if no custom name.
      */
@@ -73,97 +75,103 @@ public class ItemDefinition {
         }
         return formatMaterialName(material);
     }
-    
+
     /**
      * Formats a material name to be more readable.
      */
     private String formatMaterialName(Material material) {
         String name = material.name();
         StringBuilder formatted = new StringBuilder();
-        
+
         String[] parts = name.split("_");
         for (int i = 0; i < parts.length; i++) {
             if (i > 0) {
                 formatted.append(" ");
             }
             formatted.append(parts[i].charAt(0))
-                     .append(parts[i].substring(1).toLowerCase());
+                    .append(parts[i].substring(1).toLowerCase());
         }
-        
+
         return formatted.toString();
     }
-    
+
     /**
      * Represents armor trim data for an item.
      */
     public static class ArmorTrimData {
         private final String pattern;
         private final String material;
-        
+
         public ArmorTrimData(String pattern, String material) {
             this.pattern = pattern;
             this.material = material;
         }
-        
+
         public String getPattern() { return pattern; }
         public String getMaterial() { return material; }
-        
+
         public boolean isValid() {
-            return pattern != null && !pattern.isBlank() && 
-                   material != null && !material.isBlank();
+            return pattern != null && !pattern.isBlank() &&
+                    material != null && !material.isBlank();
         }
-        
+
         /**
-         * Parses the trim pattern from string.
+         * Parses the trim pattern from string using the registry.
          */
         public TrimPattern parseTrimPattern() {
             if (pattern == null) return null;
-            
+
             try {
-                return TrimPattern.valueOf(pattern.toUpperCase());
-            } catch (IllegalArgumentException e) {
+                // Use the registry to get the TrimPattern
+                return Registry.TRIM_PATTERN.get(
+                        NamespacedKey.minecraft(pattern.toLowerCase())
+                );
+            } catch (Exception e) {
                 return null;
             }
         }
-        
+
         /**
-         * Parses the trim material from string.
+         * Parses the trim material from string using the registry.
          */
         public TrimMaterial parseTrimMaterial() {
             if (material == null) return null;
-            
+
             try {
-                return TrimMaterial.valueOf(material.toUpperCase());
-            } catch (IllegalArgumentException e) {
+                // Use the registry to get the TrimMaterial
+                return Registry.TRIM_MATERIAL.get(
+                        NamespacedKey.minecraft(material.toLowerCase())
+                );
+            } catch (Exception e) {
                 return null;
             }
         }
     }
-    
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) return true;
         if (obj == null || getClass() != obj.getClass()) return false;
-        
+
         ItemDefinition that = (ItemDefinition) obj;
         return Objects.equals(id, that.id);
     }
-    
+
     @Override
     public int hashCode() {
         return Objects.hash(id);
     }
-    
+
     @Override
     public String toString() {
         return "ItemDefinition{" +
-               "id='" + id + '\'' +
-               ", material=" + material +
-               ", name='" + name + '\'' +
-               ", hasLore=" + !lore.isEmpty() +
-               ", unbreakable=" + unbreakable +
-               ", hasEnchantments=" + !enchantments.isEmpty() +
-               ", disableUse=" + disableUse +
-               '}';
+                "id='" + id + '\'' +
+                ", material=" + material +
+                ", name='" + name + '\'' +
+                ", hasLore=" + !lore.isEmpty() +
+                ", unbreakable=" + unbreakable +
+                ", hasEnchantments=" + !enchantments.isEmpty() +
+                ", disableUse=" + disableUse +
+                '}';
     }
 }

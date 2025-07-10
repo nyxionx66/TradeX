@@ -1,0 +1,65 @@
+# ProTrades Configuration File
+# Complete custom item system with trade integration
+
+# Debug mode for detailed logging
+debug: false
+
+# Plugin version info
+version: "1.0.0"
+
+# Database settings (future expansion)
+database:
+  enabled: false
+  type: "sqlite"
+  
+# Trade system settings
+trades:
+  auto-save: true
+  save-interval: 300 # seconds
+  backup-trades: true
+  
+# Performance settings
+performance:
+  cache-items: true
+  cache-size: 1000
+  async-operations: true
+  
+# Integration settings
+integration:
+  proitems: true
+  vault: false
+  placeholderapi: false
+
+# ItemX Configuration (integrated)
+itemx:
+  # Debug mode
+  debug: true
+
+  # Message prefix
+  prefix: "<gray>[<aqua>ItemX</aqua>]</gray> "
+
+  # Command messages
+  messages:
+    give-message: "<green>Gave <yellow>%item%</yellow> to <blue>%player%</blue>"
+    get-message: "<green>You received <yellow>%item%</yellow>"
+    get-category-message: "<green>You received <yellow>%count%</yellow> items from category <aqua>%category%</aqua>"
+    no-permission: "<red>You don't have permission to use this command."
+    player-not-found: "<red>Player <yellow>%player%</yellow> not found."
+    item-not-found: "<red>Item <yellow>%item%</yellow> not found."
+    reload-success: "<green>ItemX has been reloaded successfully!"
+    invalid-usage: "<red>Usage: /itemx <give|get|reload>"
+
+  # NBT Configuration
+  nbt:
+    key: "itemx:id"
+    namespace-prefix: "itemx"
+
+  # Item Configuration
+  items:
+    auto-reload: false
+    reload-interval: 300 # seconds
+    
+  # Integration Settings
+  integration:
+    protrades: true
+    trade-compatibility: true
