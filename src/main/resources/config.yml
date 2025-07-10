@@ -1,5 +1,5 @@
 # ProTrades Configuration File
-# Streamlined configuration for trading system
+# Configuration for the trade system
 
 # Debug mode for detailed logging
 debug: false
@@ -31,52 +31,25 @@ integration:
   vault: false
   placeholderapi: false
 
-# ItemX Configuration (integrated and simplified)
-itemx:
-  # Debug mode
-  debug: true
-  
-  # Message prefix
+# Trade System Messages
+messages:
   prefix: "<gray>[<aqua>ProTrades</aqua>]</gray> "
+  trade-created: "<green>Trade <yellow>%trade%</yellow> created successfully!"
+  config-saved: "<green>Configuration saved successfully!"
+  no-permission: "<red>You don't have permission to use this command."
   
-  # Command messages
-  messages:
-    give-message: "<green>Gave <yellow>%item%</yellow> to <blue>%player%</blue>"
-    get-message: "<green>You received <yellow>%item%</yellow>"
-    get-category-message: "<green>You received <yellow>%count%</yellow> items from category <aqua>%category%</aqua>"
-    no-permission: "<red>You don't have permission to use this command."
-    player-not-found: "<red>Player <yellow>%player%</yellow> not found."
-    item-not-found: "<red>Item <yellow>%item%</yellow> not found."
-    reload-success: "<green>ProTrades has been reloaded successfully!"
-    template-applied: "<green>Template <yellow>%template%</yellow> applied to GUI <aqua>%gui%</aqua>"
-    trade-created: "<green>Trade <yellow>%trade%</yellow> created successfully!"
-    config-saved: "<green>Configuration saved successfully!"
-    
-  # NBT Configuration
-  nbt:
-    key: "protrades:id"
-    namespace-prefix: "protrades"
-    
-  # Item Configuration
-  items:
-    auto-reload: true
-    reload-interval: 300 # seconds
-    
-  # Template Configuration
-  templates:
-    auto-load: true
-    validate-items: true
-    create-missing-items: false
-    
-  # GUI Configuration
-  gui:
-    default-title: "&1&lProTrades Shop"
-    default-rows: 6
-    fill-empty-slots: true
-    fill-material: "GRAY_STAINED_GLASS_PANE"
-    
+# NBT Configuration
+nbt:
+  key: "protrades:id"
+  namespace-prefix: "protrades"
+  
+# GUI Configuration
+gui:
+  default-title: "&1&lProTrades Shop"
+  default-rows: 6
+  fill-empty-slots: true
+  fill-material: "GRAY_STAINED_GLASS_PANE"
+  
 # Example Configuration
 examples:
-  create-default-items: true
   create-default-trades: true
-  create-default-templates: true
