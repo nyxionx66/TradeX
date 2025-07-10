@@ -173,16 +173,6 @@ public final class ProTrades extends JavaPlugin {
             getLogger().warning("Configuration validation failed");
         }
         
-        // Validate items
-        if (!itemManager.validateAllItems()) {
-            getLogger().warning("Item validation failed");
-        }
-        
-        // Validate templates
-        if (!templateManager.validateAllTemplates()) {
-            getLogger().warning("Template validation failed");
-        }
-        
         getLogger().info("System validation completed");
     }
 
