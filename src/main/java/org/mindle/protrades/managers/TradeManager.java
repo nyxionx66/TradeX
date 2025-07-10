@@ -162,24 +162,26 @@ public class TradeManager {
 
     /**
      * Adds a trade to a specific GUI with enhanced NBT validation and preservation.
+     * Uses the ultra cloning system for maximum data preservation.
      * 
      * @param guiId The ID of the GUI
      * @param trade The trade to add
      */
     public void addTrade(String guiId, Trade trade) {
-        // Create trading-safe copies of all items to ensure NBT preservation
-        List<ItemStack> safeInputs = new ArrayList<>();
-        for (ItemStack input : trade.inputs()) {
-            safeInputs.add(ItemUtils.createTradingSafeCopy(input));
-        }
+        // Use ultra cloning system for perfect item preservation
+        List<ItemStack> safeInputs = ItemUtils.createPerfectCloneList(trade.inputs());
+        ItemStack safeOutput = ItemUtils.createPerfectClone(trade.output());
         
-        ItemStack safeOutput = ItemUtils.createTradingSafeCopy(trade.output());
-        
-        // Create a new trade with trading-safe items
+        // Create a new trade with ultra-cloned items
         Trade safeTrade = Trade.of(trade.id(), safeInputs, safeOutput);
         
         // Validate trade items have proper NBT data
         validateTradeItems(safeTrade);
+        
+        // Verify clone integrity
+        if (!verifyTradeIntegrity(trade, safeTrade)) {
+            plugin.getLogger().warning("Trade clone integrity verification failed for trade: " + trade.id());
+        }
         
         tradeGUIs.computeIfAbsent(guiId, k -> new HashMap<>()).put(safeTrade.id(), safeTrade);
         
@@ -191,7 +193,7 @@ public class TradeManager {
         
         saveTradeGUI(guiId);
         
-        plugin.getLogger().info("Added trade: " + safeTrade.id() + " to GUI: " + guiId + " with enhanced NBT support");
+        plugin.getLogger().info("Added trade: " + safeTrade.id() + " to GUI: " + guiId + " with ultra cloning system");
     }
 
     /**
