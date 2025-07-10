@@ -1,0 +1,138 @@
+# Dragon Armor Set Configuration
+# Complete armor set with set bonuses
+
+dragon_helmet:
+  material: NETHERITE_HELMET
+  name: "<gradient:#8B0000:#FF4500>🐉 Dragon Scale Helmet 🐉</gradient>"
+  lore:
+    - "&7Forged from ancient dragon scales"
+    - "&7Provides immunity to fire damage"
+    - ""
+    - "&eSet Bonus (2/4):"
+    - "&7• <gradient:#FF4500:#FF0000>Fire Immunity</gradient>"
+    - "&eSet Bonus (4/4):"
+    - "&7• <gradient:#FFD700:#FFA500>Dragon Flight</gradient>"
+    - "&7• <gradient:#FF0000:#8B0000>Dragon Breath</gradient>"
+    - ""
+    - "&c&lDRAGON ARMOR"
+  unbreakable: true
+  use-vanilla-lore: false
+  enchants:
+    PROTECTION: 8
+    FIRE_PROTECTION: 15
+    RESPIRATION: 10
+    AQUA_AFFINITY: 1
+    UNBREAKING: 20
+  disable-use: false
+  nbt-id: "dragon_helmet"
+  armor-trim:
+    pattern: rib
+    material: netherite
+  custom-nbt:
+    armor_set: "dragon"
+    set_piece: "helmet"
+    power_level: 100
+    fire_immunity: true
+    dragon_sight: true
+
+dragon_chestplate:
+  material: NETHERITE_CHESTPLATE
+  name: "<gradient:#8B0000:#FF4500>🐉 Dragon Scale Chestplate 🐉</gradient>"
+  lore:
+    - "&7Crafted from the heart of a dragon"
+    - "&7Grants incredible protection"
+    - ""
+    - "&eSet Bonus (2/4):"
+    - "&7• <gradient:#FF4500:#FF0000>Fire Immunity</gradient>"
+    - "&eSet Bonus (4/4):"
+    - "&7• <gradient:#FFD700:#FFA500>Dragon Flight</gradient>"
+    - "&7• <gradient:#FF0000:#8B0000>Dragon Breath</gradient>"
+    - ""
+    - "&c&lDRAGON ARMOR"
+  unbreakable: true
+  use-vanilla-lore: false
+  enchants:
+    PROTECTION: 10
+    FIRE_PROTECTION: 20
+    THORNS: 5
+    UNBREAKING: 25
+  disable-use: false
+  nbt-id: "dragon_chestplate"
+  armor-trim:
+    pattern: rib
+    material: netherite
+  custom-nbt:
+    armor_set: "dragon"
+    set_piece: "chestplate"
+    power_level: 150
+    fire_immunity: true
+    dragon_strength: 10
+
+dragon_leggings:
+  material: NETHERITE_LEGGINGS
+  name: "<gradient:#8B0000:#FF4500>🐉 Dragon Scale Leggings 🐉</gradient>"
+  lore:
+    - "&7Provides swift movement"
+    - "&7like a dragon in flight"
+    - ""
+    - "&eSet Bonus (2/4):"
+    - "&7• <gradient:#FF4500:#FF0000>Fire Immunity</gradient>"
+    - "&eSet Bonus (4/4):"
+    - "&7• <gradient:#FFD700:#FFA500>Dragon Flight</gradient>"
+    - "&7• <gradient:#FF0000:#8B0000>Dragon Breath</gradient>"
+    - ""
+    - "&c&lDRAGON ARMOR"
+  unbreakable: true
+  use-vanilla-lore: false
+  enchants:
+    PROTECTION: 8
+    FIRE_PROTECTION: 15
+    SWIFT_SNEAK: 5
+    UNBREAKING: 20
+  disable-use: false
+  nbt-id: "dragon_leggings"
+  armor-trim:
+    pattern: rib
+    material: netherite
+  custom-nbt:
+    armor_set: "dragon"
+    set_piece: "leggings"
+    power_level: 100
+    fire_immunity: true
+    dragon_speed: 2
+
+dragon_boots:
+  material: NETHERITE_BOOTS
+  name: "<gradient:#8B0000:#FF4500>🐉 Dragon Scale Boots 🐉</gradient>"
+  lore:
+    - "&7Allows walking on lava"
+    - "&7and grants incredible speed"
+    - ""
+    - "&eSet Bonus (2/4):"
+    - "&7• <gradient:#FF4500:#FF0000>Fire Immunity</gradient>"
+    - "&eSet Bonus (4/4):"
+    - "&7• <gradient:#FFD700:#FFA500>Dragon Flight</gradient>"
+    - "&7• <gradient:#FF0000:#8B0000>Dragon Breath</gradient>"
+    - ""
+    - "&c&lDRAGON ARMOR"
+  unbreakable: true
+  use-vanilla-lore: false
+  enchants:
+    PROTECTION: 6
+    FIRE_PROTECTION: 15
+    FEATHER_FALLING: 10
+    DEPTH_STRIDER: 5
+    SOUL_SPEED: 5
+    UNBREAKING: 20
+  disable-use: false
+  nbt-id: "dragon_boots"
+  armor-trim:
+    pattern: rib
+    material: netherite
+  custom-nbt:
+    armor_set: "dragon"
+    set_piece: "boots"
+    power_level: 80
+    fire_immunity: true
+    lava_walking: true
+    dragon_speed: 3

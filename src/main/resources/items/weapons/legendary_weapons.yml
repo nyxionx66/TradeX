@@ -1,0 +1,120 @@
+# Legendary Weapons Configuration
+# High-tier weapons for advanced trading
+
+legendary_sword:
+  material: NETHERITE_SWORD
+  name: "<gradient:#FF0000:#8B0000>⚔ Legendary Blade ⚔</gradient>"
+  lore:
+    - "&7Forged in the depths of the Nether"
+    - "&7by ancient dragon smiths"
+    - ""
+    - "&eAbilities:"
+    - "&7• <gradient:#FFD700:#FFA500>Devastation Strike</gradient>"
+    - "&7• <gradient:#FF4500:#FF0000>Fire Immunity</gradient>"
+    - "&7• <gradient:#00FF00:#008000>Life Steal</gradient>"
+    - ""
+    - "&6&lLEGENDARY WEAPON"
+  unbreakable: true
+  use-vanilla-lore: false
+  enchants:
+    SHARPNESS: 15
+    FIRE_ASPECT: 5
+    LOOTING: 7
+    SWEEPING_EDGE: 5
+    UNBREAKING: 10
+  disable-use: false
+  nbt-id: "legendary_sword"
+  custom-nbt:
+    power_level: 150
+    rarity: "legendary"
+    weapon_type: "sword"
+    life_steal: 0.1
+    fire_immunity: true
+    devastation_chance: 0.15
+
+flaming_blade:
+  material: DIAMOND_SWORD
+  name: "<gradient:#FF4500:#FF0000>🔥 Flaming Executioner 🔥</gradient>"
+  lore:
+    - "&cIgnites enemies with each strike"
+    - "&7Blessed by the Fire Lords"
+    - ""
+    - "&eAbilities:"
+    - "&7• <gradient:#FF4500:#FF0000>Eternal Flame</gradient>"
+    - "&7• <gradient:#FFA500:#FF8C00>Burn Spread</gradient>"
+    - ""
+    - "&c&lFIRE WEAPON"
+  unbreakable: true
+  use-vanilla-lore: false
+  enchants:
+    FIRE_ASPECT: 8
+    SHARPNESS: 12
+    KNOCKBACK: 3
+    UNBREAKING: 15
+  disable-use: false
+  nbt-id: "flaming_blade"
+  custom-nbt:
+    power_level: 120
+    rarity: "epic"
+    weapon_type: "sword"
+    fire_damage: 8
+    burn_duration: 15
+    burn_spread: true
+
+frost_blade:
+  material: IRON_SWORD
+  name: "<gradient:#87CEEB:#4682B4>❄ Frost Reaper ❄</gradient>"
+  lore:
+    - "&bFreezes enemies solid"
+    - "&7Crafted from eternal ice"
+    - ""
+    - "&eAbilities:"
+    - "&7• <gradient:#87CEEB:#4682B4>Freeze Strike</gradient>"
+    - "&7• <gradient:#B0E0E6:#87CEEB>Ice Armor</gradient>"
+    - ""
+    - "&b&lFROST WEAPON"
+  unbreakable: true
+  use-vanilla-lore: false
+  enchants:
+    SHARPNESS: 10
+    KNOCKBACK: 5
+    UNBREAKING: 12
+  disable-use: false
+  nbt-id: "frost_blade"
+  custom-nbt:
+    power_level: 100
+    rarity: "rare"
+    weapon_type: "sword"
+    freeze_chance: 0.25
+    ice_armor: true
+    frost_damage: 5
+
+thunder_hammer:
+  material: NETHERITE_AXE
+  name: "<gradient:#FFD700:#FFFF00>⚡ Thunder Hammer ⚡</gradient>"
+  lore:
+    - "&eChannels the power of lightning"
+    - "&7Wielded by storm giants"
+    - ""
+    - "&eAbilities:"
+    - "&7• <gradient:#FFD700:#FFFF00>Lightning Strike</gradient>"
+    - "&7• <gradient:#87CEEB:#4682B4>Chain Lightning</gradient>"
+    - "&7• <gradient:#FF4500:#FF0000>Thunder Slam</gradient>"
+    - ""
+    - "&e&lTHUNDER WEAPON"
+  unbreakable: true
+  use-vanilla-lore: false
+  enchants:
+    SHARPNESS: 18
+    EFFICIENCY: 10
+    UNBREAKING: 20
+  disable-use: false
+  nbt-id: "thunder_hammer"
+  custom-nbt:
+    power_level: 200
+    rarity: "mythic"
+    weapon_type: "axe"
+    lightning_chance: 0.3
+    chain_lightning: true
+    thunder_slam: true
+    storm_power: 50

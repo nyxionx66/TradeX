@@ -9,7 +9,7 @@ website: https://mindle.org
 commands:
   protrades:
     description: Main ProTrades admin command
-    aliases: [pt]
+    aliases: [pt, ptrades]
     permission: protrades.admin
     usage: /protrades <create|delete|edit|list|reload> [args]
   trade:

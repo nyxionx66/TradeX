@@ -1,0 +1,121 @@
+# Master Tools Configuration
+# Ultimate tools for resource gathering
+
+miners_pickaxe:
+  material: NETHERITE_PICKAXE
+  name: "<gradient:#FFD700:#FFA500>⛏ Miner's Dream Pickaxe ⛏</gradient>"
+  lore:
+    - "&7The ultimate mining companion"
+    - "&7Breaks through any material"
+    - ""
+    - "&eAbilities:"
+    - "&7• <gradient:#FFD700:#FFA500>Vein Miner</gradient>"
+    - "&7• <gradient:#87CEEB:#4682B4>Auto Smelt</gradient>"
+    - "&7• <gradient:#00FF00:#008000>Fortune Boost</gradient>"
+    - ""
+    - "&e&lMINING TOOL"
+  unbreakable: true
+  use-vanilla-lore: false
+  enchants:
+    EFFICIENCY: 20
+    FORTUNE: 15
+    SILK_TOUCH: 1
+    UNBREAKING: 30
+  disable-use: false
+  nbt-id: "miners_pickaxe"
+  custom-nbt:
+    tool_type: "pickaxe"
+    power_level: 200
+    vein_miner: true
+    auto_smelt: true
+    fortune_boost: 5
+    mining_speed: 500
+
+forest_axe:
+  material: NETHERITE_AXE
+  name: "<gradient:#228B22:#90EE90>🌲 Forest Guardian Axe 🌲</gradient>"
+  lore:
+    - "&aChops entire trees instantly"
+    - "&7Blessed by forest spirits"
+    - ""
+    - "&eAbilities:"
+    - "&7• <gradient:#228B22:#90EE90>Tree Feller</gradient>"
+    - "&7• <gradient:#8B4513:#DEB887>Auto Replant</gradient>"
+    - "&7• <gradient:#00FF00:#008000>Nature's Blessing</gradient>"
+    - ""
+    - "&a&lFOREST TOOL"
+  unbreakable: true
+  use-vanilla-lore: false
+  enchants:
+    EFFICIENCY: 18
+    FORTUNE: 12
+    SHARPNESS: 8
+    UNBREAKING: 25
+  disable-use: false
+  nbt-id: "forest_axe"
+  custom-nbt:
+    tool_type: "axe"
+    power_level: 180
+    tree_feller: true
+    auto_replant: true
+    nature_blessing: true
+    wood_bonus: 3
+
+excavator_shovel:
+  material: NETHERITE_SHOVEL
+  name: "<gradient:#8B4513:#DEB887>🏗 Master Excavator 🏗</gradient>"
+  lore:
+    - "&7Moves mountains with ease"
+    - "&7Engineered for mass excavation"
+    - ""
+    - "&eAbilities:"
+    - "&7• <gradient:#8B4513:#DEB887>Area Dig</gradient>"
+    - "&7• <gradient:#FFD700:#FFA500>Treasure Hunter</gradient>"
+    - "&7• <gradient:#87CEEB:#4682B4>Void Storage</gradient>"
+    - ""
+    - "&6&lEXCAVATION TOOL"
+  unbreakable: true
+  use-vanilla-lore: false
+  enchants:
+    EFFICIENCY: 25
+    FORTUNE: 10
+    SILK_TOUCH: 1
+    UNBREAKING: 30
+  disable-use: false
+  nbt-id: "excavator_shovel"
+  custom-nbt:
+    tool_type: "shovel"
+    power_level: 220
+    area_dig: true
+    treasure_hunter: true
+    void_storage: true
+    dig_radius: 5
+
+farmers_hoe:
+  material: NETHERITE_HOE
+  name: "<gradient:#90EE90:#228B22>🌾 Farmer's Miracle Hoe 🌾</gradient>"
+  lore:
+    - "&aGrows crops instantly"
+    - "&7Infused with growth magic"
+    - ""
+    - "&eAbilities:"
+    - "&7• <gradient:#90EE90:#228B22>Instant Growth</gradient>"
+    - "&7• <gradient:#FFD700:#FFA500>Auto Harvest</gradient>"
+    - "&7• <gradient:#87CEEB:#4682B4>Crop Boost</gradient>"
+    - ""
+    - "&a&lFARMING TOOL"
+  unbreakable: true
+  use-vanilla-lore: false
+  enchants:
+    EFFICIENCY: 15
+    FORTUNE: 8
+    UNBREAKING: 20
+  disable-use: false
+  nbt-id: "farmers_hoe"
+  custom-nbt:
+    tool_type: "hoe"
+    power_level: 150
+    instant_growth: true
+    auto_harvest: true
+    crop_boost: 2
+    farming_radius: 7
