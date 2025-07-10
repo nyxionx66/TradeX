@@ -1,23 +1,11 @@
 package org.mindle.protrades.itemx;
 
-import net.kyori.adventure.text.Component;
 import org.bukkit.Material;
-import org.bukkit.NamespacedKey;
-import org.bukkit.enchantments.Enchantment;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.block.BlockPlaceEvent;
-import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.configuration.ConfigurationSection;
+import org.bukkit.configuration.file.FileConfiguration;
+import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
-import org.bukkit.inventory.meta.ArmorMeta;
-import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.inventory.meta.trim.ArmorTrim;
-import org.bukkit.inventory.meta.trim.TrimMaterial;
-import org.bukkit.inventory.meta.trim.TrimPattern;
-import org.bukkit.persistence.PersistentDataContainer;
-import org.bukkit.persistence.PersistentDataType;
 import org.mindle.protrades.ProTrades;
-import org.mindle.protrades.utils.NBTUtils;
 
 import java.io.File;
 import java.util.*;
@@ -25,276 +13,215 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 /**
- * Manages all ItemX items - loading, creating, and handling events.
- * Integrates with the existing ProTrades NBT system.
+ * Enhanced ItemManager for the new resource structure.
+ * Manages custom ItemX items with improved organization and caching.
  */
-public class ItemManager implements Listener {
+public class ItemManager {
     
     private final ProTrades plugin;
-    private final ItemParser parser;
     private final Map<String, ItemDefinition> items;
     private final Map<String, Set<String>> categories;
-    private final NamespacedKey itemxKey;
-    private final String namespacePrefix;
     private final File itemsDirectory;
+    private final ItemParser itemParser;
+    private final ColorUtil colorUtil;
     
     public ItemManager(ProTrades plugin) {
         this.plugin = plugin;
-        this.parser = new ItemParser(plugin);
         this.items = new ConcurrentHashMap<>();
         this.categories = new ConcurrentHashMap<>();
-        this.itemsDirectory = new File(plugin.getDataFolder(), "itemx/items");
+        this.itemsDirectory = new File(plugin.getDataFolder(), "items");
+        this.itemParser = new ItemParser(plugin);
+        this.colorUtil = new ColorUtil();
         
-        // Get configuration values
-        this.namespacePrefix = plugin.getConfig().getString("itemx.nbt.namespace-prefix", "itemx");
-        String nbtKey = plugin.getConfig().getString("itemx.nbt.key", "itemx:id");
-        
-        // Create the NBT key
-        String[] keyParts = nbtKey.split(":", 2);
-        if (keyParts.length == 2) {
-            this.itemxKey = new NamespacedKey(keyParts[0], keyParts[1]);
-        } else {
-            this.itemxKey = new NamespacedKey(namespacePrefix, "id");
-        }
-        
-        // Create directories if they don't exist
         createDirectories();
-        
-        // Register as event listener
-        plugin.getServer().getPluginManager().registerEvents(this, plugin);
     }
     
     /**
-     * Creates necessary directories for ItemX.
+     * Creates necessary directories for items.
      */
     private void createDirectories() {
-        File itemxDir = new File(plugin.getDataFolder(), "itemx");
-        if (!itemxDir.exists()) {
-            itemxDir.mkdirs();
-        }
-        
         if (!itemsDirectory.exists()) {
             itemsDirectory.mkdirs();
-            
-            // Create default category directories
-            new File(itemsDirectory, "weapons").mkdirs();
-            new File(itemsDirectory, "tools").mkdirs();
-            new File(itemsDirectory, "armor").mkdirs();
-            new File(itemsDirectory, "misc").mkdirs();
+            plugin.getLogger().info("Created items directory: " + itemsDirectory.getPath());
         }
     }
     
     /**
-     * Loads all ItemX items from configuration files.
+     * Loads all items from the items directory.
      */
     public void loadAllItems() {
         items.clear();
         categories.clear();
         
         try {
-            Map<String, ItemDefinition> loadedItems = parser.parseAllItems(itemsDirectory);
+            loadDirectory(itemsDirectory);
             
-            for (Map.Entry<String, ItemDefinition> entry : loadedItems.entrySet()) {
-                String itemId = entry.getKey();
-                ItemDefinition item = entry.getValue();
-                
-                if (parser.validateItemDefinition(item)) {
-                    items.put(itemId, item);
-                    
-                    // Add to categories (based on file location)
-                    String category = determineCategory(itemId);
-                    categories.computeIfAbsent(category, k -> new HashSet<>()).add(itemId);
-                    
-                    plugin.getLogger().fine("Loaded ItemX item: " + itemId + " (category: " + category + ")");
-                }
+            plugin.getLogger().info("Loaded " + items.size() + " custom items in " + categories.size() + " categories");
+            
+            // Log category breakdown
+            for (Map.Entry<String, Set<String>> entry : categories.entrySet()) {
+                plugin.getLogger().info("Category '" + entry.getKey() + "': " + entry.getValue().size() + " items");
             }
             
-            plugin.getLogger().info("Loaded " + items.size() + " ItemX items in " + categories.size() + " categories");
-            
         } catch (Exception e) {
-            plugin.getLogger().log(Level.SEVERE, "Error loading ItemX items", e);
+            plugin.getLogger().log(Level.SEVERE, "Error loading items", e);
         }
     }
     
     /**
-     * Creates an ItemStack from an ItemDefinition.
+     * Recursively loads items from a directory.
      */
-    public ItemStack createItemStack(ItemDefinition item) {
-        if (item == null || !item.isValid()) {
-            return null;
+    private void loadDirectory(File directory) {
+        File[] files = directory.listFiles();
+        if (files == null) return;
+        
+        for (File file : files) {
+            if (file.isDirectory()) {
+                loadDirectory(file);
+            } else if (file.getName().endsWith(".yml") || file.getName().endsWith(".yaml")) {
+                loadItemFile(file);
+            }
+        }
+    }
+    
+    /**
+     * Loads items from a single YAML file.
+     */
+    private void loadItemFile(File file) {
+        try {
+            FileConfiguration config = YamlConfiguration.loadConfiguration(file);
+            String category = getCategoryFromPath(file);
+            
+            for (String key : config.getKeys(false)) {
+                ConfigurationSection section = config.getConfigurationSection(key);
+                if (section != null) {
+                    ItemDefinition item = parseItem(key, section, category);
+                    if (item != null && item.isValid()) {
+                        items.put(key, item);
+                        categories.computeIfAbsent(category, k -> new HashSet<>()).add(key);
+                        
+                        plugin.getLogger().fine("Loaded item: " + key + " (category: " + category + ")");
+                    } else {
+                        plugin.getLogger().warning("Invalid item: " + key + " in file: " + file.getName());
+                    }
+                }
+            }
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.WARNING, "Error loading item file: " + file.getName(), e);
+        }
+    }
+    
+    /**
+     * Gets the category from the file path.
+     */
+    private String getCategoryFromPath(File file) {
+        String path = file.getPath();
+        String itemsPath = itemsDirectory.getPath();
+        
+        if (path.startsWith(itemsPath)) {
+            String relativePath = path.substring(itemsPath.length() + 1);
+            String[] parts = relativePath.split(File.separator);
+            if (parts.length > 1) {
+                return parts[0]; // First directory is the category
+            }
         }
         
+        return "misc"; // Default category
+    }
+    
+    /**
+     * Parses an item definition from configuration.
+     */
+    private ItemDefinition parseItem(String id, ConfigurationSection section, String category) {
         try {
-            ItemStack itemStack = new ItemStack(item.getMaterial());
-            ItemMeta meta = itemStack.getItemMeta();
-            
-            if (meta == null) {
-                plugin.getLogger().warning("Could not get ItemMeta for item: " + item.getId());
+            String materialName = section.getString("material");
+            if (materialName == null) {
+                plugin.getLogger().warning("Item " + id + " has no material defined");
                 return null;
             }
             
-            // Set display name
-            if (item.getName() != null && !item.getName().isEmpty()) {
-                Component nameComponent = ColorUtil.colorize(item.getName());
-                meta.displayName(nameComponent);
+            Material material = Material.matchMaterial(materialName);
+            if (material == null) {
+                plugin.getLogger().warning("Item " + id + " has invalid material: " + materialName);
+                return null;
             }
             
-            // Set lore
-            if (!item.getLore().isEmpty()) {
-                List<Component> loreComponents = ColorUtil.colorizeList(item.getLore());
-                meta.lore(loreComponents);
+            String name = section.getString("name", id);
+            List<String> lore = section.getStringList("lore");
+            boolean unbreakable = section.getBoolean("unbreakable", false);
+            boolean useVanillaLore = section.getBoolean("use-vanilla-lore", false);
+            boolean disableUse = section.getBoolean("disable-use", false);
+            String nbtId = section.getString("nbt-id", id);
+            
+            // Parse enchantments
+            Map<String, Integer> enchantments = new HashMap<>();
+            ConfigurationSection enchantsSection = section.getConfigurationSection("enchants");
+            if (enchantsSection != null) {
+                for (String enchant : enchantsSection.getKeys(false)) {
+                    int level = enchantsSection.getInt(enchant);
+                    enchantments.put(enchant, level);
+                }
             }
             
-            // Set unbreakable
-            if (item.isUnbreakable()) {
-                meta.setUnbreakable(true);
+            // Parse custom NBT
+            Map<String, Object> customNbt = new HashMap<>();
+            ConfigurationSection nbtSection = section.getConfigurationSection("custom-nbt");
+            if (nbtSection != null) {
+                for (String nbtKey : nbtSection.getKeys(false)) {
+                    customNbt.put(nbtKey, nbtSection.get(nbtKey));
+                }
             }
             
-            // Add enchantments
-            addEnchantments(meta, item.getEnchantments());
+            // Parse armor trim
+            Map<String, String> armorTrim = new HashMap<>();
+            ConfigurationSection trimSection = section.getConfigurationSection("armor-trim");
+            if (trimSection != null) {
+                armorTrim.put("pattern", trimSection.getString("pattern"));
+                armorTrim.put("material", trimSection.getString("material"));
+            }
             
-            // Add armor trim
-            addArmorTrim(meta, item.getArmorTrim());
-            
-            // Add ItemX NBT identifier
-            PersistentDataContainer container = meta.getPersistentDataContainer();
-            container.set(itemxKey, PersistentDataType.STRING, item.getNbtId());
-            
-            // Add custom NBT data
-            addCustomNBT(container, item.getCustomNBT());
-            
-            itemStack.setItemMeta(meta);
-            
-            // Create trading-safe copy using existing NBT system
-            return NBTUtils.createTradingSafeCopy(itemStack);
+            return new ItemDefinition(
+                id, material, name, lore, unbreakable, useVanillaLore, 
+                enchantments, disableUse, nbtId, customNbt, armorTrim, category
+            );
             
         } catch (Exception e) {
-            plugin.getLogger().log(Level.SEVERE, "Error creating ItemStack for item: " + item.getId(), e);
+            plugin.getLogger().log(Level.WARNING, "Error parsing item: " + id, e);
             return null;
         }
     }
     
     /**
-     * Creates an ItemStack by item ID.
+     * Creates an ItemStack from an item definition.
      */
     public ItemStack createItemStack(String itemId) {
-        ItemDefinition item = items.get(itemId);
-        return createItemStack(item);
-    }
-    
-    /**
-     * Adds enchantments to an ItemMeta.
-     */
-    private void addEnchantments(ItemMeta meta, Map<String, Integer> enchantments) {
-        if (enchantments == null || enchantments.isEmpty()) {
-            return;
-        }
-        
-        for (Map.Entry<String, Integer> entry : enchantments.entrySet()) {
-            String enchantName = entry.getKey();
-            int level = entry.getValue();
-            
-            // Try to get the enchantment by name
-            Enchantment enchant = Enchantment.getByKey(NamespacedKey.minecraft(enchantName.toLowerCase()));
-            
-            if (enchant != null) {
-                // Use unsafe enchantment to allow levels beyond vanilla limits
-                meta.addEnchant(enchant, level, true);
-            } else {
-                plugin.getLogger().warning("Unknown enchantment: " + enchantName);
-            }
-        }
-    }
-    
-    /**
-     * Adds armor trim to an ItemMeta.
-     */
-    private void addArmorTrim(ItemMeta meta, ItemDefinition.ArmorTrimData trimData) {
-        if (trimData == null || !trimData.isValid() || !(meta instanceof ArmorMeta)) {
-            return;
+        ItemDefinition definition = items.get(itemId);
+        if (definition == null) {
+            plugin.getLogger().warning("Item not found: " + itemId);
+            return null;
         }
         
         try {
-            TrimPattern pattern = trimData.parseTrimPattern();
-            TrimMaterial material = trimData.parseTrimMaterial();
-            
-            if (pattern != null && material != null) {
-                ArmorTrim trim = new ArmorTrim(material, pattern);
-                ((ArmorMeta) meta).setTrim(trim);
-            }
+            return itemParser.createItemStack(definition);
         } catch (Exception e) {
-            plugin.getLogger().warning("Error adding armor trim: " + e.getMessage());
-        }
-    }
-    
-    /**
-     * Adds custom NBT data to a PersistentDataContainer.
-     */
-    private void addCustomNBT(PersistentDataContainer container, Map<String, Object> customNBT) {
-        if (customNBT == null || customNBT.isEmpty()) {
-            return;
-        }
-        
-        for (Map.Entry<String, Object> entry : customNBT.entrySet()) {
-            String key = entry.getKey();
-            Object value = entry.getValue();
-            
-            try {
-                NamespacedKey nbtKey = new NamespacedKey(namespacePrefix, key);
-                
-                if (value instanceof String) {
-                    container.set(nbtKey, PersistentDataType.STRING, (String) value);
-                } else if (value instanceof Integer) {
-                    container.set(nbtKey, PersistentDataType.INTEGER, (Integer) value);
-                } else if (value instanceof Double) {
-                    container.set(nbtKey, PersistentDataType.DOUBLE, (Double) value);
-                } else if (value instanceof Boolean) {
-                    container.set(nbtKey, PersistentDataType.BYTE, (Boolean) value ? (byte) 1 : (byte) 0);
-                } else {
-                    container.set(nbtKey, PersistentDataType.STRING, value.toString());
-                }
-            } catch (Exception e) {
-                plugin.getLogger().warning("Error adding custom NBT data for key: " + key);
-            }
-        }
-    }
-    
-    /**
-     * Checks if an ItemStack is an ItemX item.
-     */
-    public boolean isItemXItem(ItemStack item) {
-        if (item == null || item.getType() == Material.AIR || !item.hasItemMeta()) {
-            return false;
-        }
-        
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) {
-            return false;
-        }
-        
-        PersistentDataContainer container = meta.getPersistentDataContainer();
-        return container.has(itemxKey, PersistentDataType.STRING);
-    }
-    
-    /**
-     * Gets the ItemX ID from an ItemStack.
-     */
-    public String getItemXId(ItemStack item) {
-        if (!isItemXItem(item)) {
+            plugin.getLogger().log(Level.SEVERE, "Error creating ItemStack for: " + itemId, e);
             return null;
         }
-        
-        ItemMeta meta = item.getItemMeta();
-        if (meta == null) {
-            return null;
-        }
-        
-        PersistentDataContainer container = meta.getPersistentDataContainer();
-        return container.get(itemxKey, PersistentDataType.STRING);
     }
     
     /**
-     * Gets an ItemDefinition by ID.
+     * Creates an ItemStack with a specific amount.
+     */
+    public ItemStack createItemStack(String itemId, int amount) {
+        ItemStack item = createItemStack(itemId);
+        if (item != null) {
+            item.setAmount(Math.max(1, amount));
+        }
+        return item;
+    }
+    
+    /**
+     * Gets an item definition by ID.
      */
     public ItemDefinition getItemDefinition(String itemId) {
         return items.get(itemId);
@@ -308,7 +235,7 @@ public class ItemManager implements Listener {
     }
     
     /**
-     * Gets all items in a category.
+     * Gets items in a category.
      */
     public Set<String> getItemsInCategory(String category) {
         return categories.getOrDefault(category, new HashSet<>());
@@ -322,97 +249,125 @@ public class ItemManager implements Listener {
     }
     
     /**
-     * Determines the category for an item based on its ID or configuration.
+     * Checks if an item exists.
      */
-    private String determineCategory(String itemId) {
-        // Simple categorization based on item ID prefixes
-        if (itemId.startsWith("weapon_") || itemId.contains("sword") || itemId.contains("axe") || itemId.contains("bow")) {
-            return "weapons";
-        } else if (itemId.startsWith("tool_") || itemId.contains("pickaxe") || itemId.contains("shovel") || itemId.contains("hoe")) {
-            return "tools";
-        } else if (itemId.startsWith("armor_") || itemId.contains("helmet") || itemId.contains("chestplate") || itemId.contains("leggings") || itemId.contains("boots")) {
-            return "armor";
-        } else {
-            return "misc";
-        }
+    public boolean hasItem(String itemId) {
+        return items.containsKey(itemId);
     }
     
     /**
-     * Event handler for block placement - handles disable-use functionality.
+     * Checks if an ItemStack is a custom item.
      */
-    @EventHandler
-    public void onBlockPlace(BlockPlaceEvent event) {
-        ItemStack item = event.getItemInHand();
-        if (!isItemXItem(item)) {
-            return;
-        }
+    public boolean isCustomItem(ItemStack item) {
+        if (item == null) return false;
         
-        String itemId = getItemXId(item);
-        if (itemId != null) {
-            ItemDefinition definition = getItemDefinition(itemId);
-            if (definition != null && definition.isDisableUse()) {
-                event.setCancelled(true);
-                plugin.getLogger().fine("Blocked placement of disabled ItemX item: " + itemId);
+        return itemParser.getCustomItemId(item) != null;
+    }
+    
+    /**
+     * Gets the custom item ID from an ItemStack.
+     */
+    public String getCustomItemId(ItemStack item) {
+        return itemParser.getCustomItemId(item);
+    }
+    
+    /**
+     * Creates ItemStacks for all items in a category.
+     */
+    public List<ItemStack> createItemsFromCategory(String category) {
+        List<ItemStack> result = new ArrayList<>();
+        Set<String> itemIds = getItemsInCategory(category);
+        
+        for (String itemId : itemIds) {
+            ItemStack item = createItemStack(itemId);
+            if (item != null) {
+                result.add(item);
             }
         }
-    }
-    
-    /**
-     * Event handler for player interaction - handles disable-use functionality.
-     */
-    @EventHandler
-    public void onPlayerInteract(PlayerInteractEvent event) {
-        ItemStack item = event.getItem();
-        if (item == null || !isItemXItem(item)) {
-            return;
-        }
         
-        String itemId = getItemXId(item);
-        if (itemId != null) {
-            ItemDefinition definition = getItemDefinition(itemId);
-            if (definition != null && definition.isDisableUse()) {
-                event.setCancelled(true);
-                plugin.getLogger().fine("Blocked interaction with disabled ItemX item: " + itemId);
-            }
-        }
+        return result;
     }
     
     /**
-     * Reloads all ItemX items from configuration files.
-     */
-    public void reload() {
-        plugin.getLogger().info("Reloading ItemX items...");
-        loadAllItems();
-        plugin.getLogger().info("ItemX items reloaded successfully!");
-    }
-    
-    /**
-     * Gets statistics about loaded items.
+     * Gets statistics about items.
      */
     public Map<String, Object> getStatistics() {
         Map<String, Object> stats = new HashMap<>();
+        
         stats.put("total_items", items.size());
-        stats.put("categories", categories.size());
+        stats.put("item_categories", categories.size());
         stats.put("category_breakdown", new HashMap<>(categories));
         
-        // Count items with specific features
-        int enchantedItems = 0;
-        int unbreakableItems = 0;
-        int armorTrimmedItems = 0;
-        int disabledItems = 0;
-        
+        // Count items by type
+        int weapons = 0, armor = 0, tools = 0, misc = 0;
         for (ItemDefinition item : items.values()) {
-            if (!item.getEnchantments().isEmpty()) enchantedItems++;
-            if (item.isUnbreakable()) unbreakableItems++;
-            if (item.getArmorTrim() != null) armorTrimmedItems++;
-            if (item.isDisableUse()) disabledItems++;
+            Material material = item.getMaterial();
+            if (material.name().contains("SWORD") || material.name().contains("AXE") || material.name().contains("BOW")) {
+                weapons++;
+            } else if (material.name().contains("HELMET") || material.name().contains("CHESTPLATE") || 
+                      material.name().contains("LEGGINGS") || material.name().contains("BOOTS")) {
+                armor++;
+            } else if (material.name().contains("PICKAXE") || material.name().contains("SHOVEL") || 
+                      material.name().contains("HOE")) {
+                tools++;
+            } else {
+                misc++;
+            }
         }
         
-        stats.put("enchanted_items", enchantedItems);
-        stats.put("unbreakable_items", unbreakableItems);
-        stats.put("armor_trimmed_items", armorTrimmedItems);
-        stats.put("disabled_items", disabledItems);
+        stats.put("weapons", weapons);
+        stats.put("armor", armor);
+        stats.put("tools", tools);
+        stats.put("misc", misc);
         
         return stats;
+    }
+    
+    /**
+     * Validates all items.
+     */
+    public boolean validateAllItems() {
+        boolean allValid = true;
+        
+        for (Map.Entry<String, ItemDefinition> entry : items.entrySet()) {
+            ItemDefinition item = entry.getValue();
+            if (!item.isValid()) {
+                plugin.getLogger().warning("Invalid item: " + entry.getKey());
+                allValid = false;
+                continue;
+            }
+            
+            // Try to create the item
+            ItemStack testItem = createItemStack(entry.getKey());
+            if (testItem == null) {
+                plugin.getLogger().warning("Cannot create ItemStack for: " + entry.getKey());
+                allValid = false;
+            }
+        }
+        
+        if (allValid) {
+            plugin.getLogger().info("All items validated successfully");
+        } else {
+            plugin.getLogger().warning("Some items have validation errors");
+        }
+        
+        return allValid;
+    }
+    
+    /**
+     * Gets the items directory.
+     */
+    public File getItemsDirectory() {
+        return itemsDirectory;
+    }
+    
+    /**
+     * Reloads all items.
+     */
+    public void reload() {
+        plugin.getLogger().info("Reloading custom items...");
+        loadAllItems();
+        validateAllItems();
+        plugin.getLogger().info("Custom items reloaded successfully!");
     }
 }
