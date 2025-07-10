@@ -465,7 +465,7 @@ public class GUIManager {
 
         // Load output item
         if (trade.output() != null) {
-            inventory.setItem(OUTPUT_SLOT, trade.output().clone());
+            inventory.setItem(OUTPUT_SLOT, ItemUtils.createDisplayClone(trade.output()));
         } else {
             inventory.setItem(OUTPUT_SLOT, createEnhancedOutputSlot());
         }
