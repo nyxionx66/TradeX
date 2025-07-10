@@ -25,6 +25,8 @@ public final class ProTrades extends JavaPlugin {
     private ConfigManager configManager;
     private NBTManager nbtManager;
     private ItemManager itemManager;
+    private TradeTemplateManager templateManager;
+    private TradeCreationGUI tradeCreationGUI;
 
     @Override
     public void onEnable() {
