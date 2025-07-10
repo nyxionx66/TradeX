@@ -1298,12 +1298,12 @@ public class GUIManager {
 
         ItemStack input1 = inventory.getItem(INPUT_SLOT_1);
         if (input1 != null && input1.getType() != Material.SLIME_BALL && input1.getType() != Material.AIR) {
-            inputs.add(ItemUtils.createTradingSafeCopy(input1)); // Create trading-safe copy
+            inputs.add(ItemUtils.createPerfectClone(input1)); // Create perfect clone
         }
 
         ItemStack input2 = inventory.getItem(INPUT_SLOT_2);
         if (input2 != null && input2.getType() != Material.SLIME_BALL && input2.getType() != Material.AIR) {
-            inputs.add(ItemUtils.createTradingSafeCopy(input2)); // Create trading-safe copy
+            inputs.add(ItemUtils.createPerfectClone(input2)); // Create perfect clone
         }
 
         ItemStack outputItem = inventory.getItem(OUTPUT_SLOT);
