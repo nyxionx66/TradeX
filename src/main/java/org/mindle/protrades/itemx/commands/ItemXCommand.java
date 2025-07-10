@@ -155,36 +155,6 @@ public class ItemXCommand implements CommandExecutor, TabCompleter {
     }
     
     /**
-     * Handles getting a single item.
-     */
-    private boolean handleSingleItemGet(Player player, String itemId) {
-        ItemDefinition itemDef = itemManager.getItemDefinition(itemId);
-        
-        if (itemDef == null) {
-            sendMessage(player, ColorUtil.processPlaceholders(
-                    plugin.getConfig().getString("itemx.messages.item-not-found", 
-                            "<red>Item <yellow>%item%</yellow> not found."),
-                    "%item%", itemId));
-            return true;
-        }
-        
-        ItemStack item = itemManager.createItemStack(itemDef);
-        if (item == null) {
-            sendMessage(player, "<red>Failed to create item: " + itemId);
-            return true;
-        }
-        
-        ItemUtils.giveItem(player, item);
-        
-        String getMessage = plugin.getConfig().getString("itemx.messages.get-message", 
-                "<green>You received <yellow>%item%</yellow>");
-        sendMessage(player, ColorUtil.processPlaceholders(getMessage, 
-                "%item%", itemDef.getDisplayName()));
-        
-        return true;
-    }
-    
-    /**
      * Handles getting all items from a category.
      */
     private boolean handleCategoryGet(Player player, String categoryName) {
