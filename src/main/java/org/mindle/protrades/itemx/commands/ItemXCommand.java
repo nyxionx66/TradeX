@@ -122,7 +122,7 @@ public class ItemXCommand implements CommandExecutor, TabCompleter {
     }
     
     /**
-     * Handles the get command: /itemx get <item-id> or /itemx get category:<category-name>
+     * Handles the get command: /itemx get category:<category-name>
      */
     private boolean handleGetCommand(CommandSender sender, String[] args) {
         if (!sender.hasPermission("itemx.get")) {
@@ -139,7 +139,7 @@ public class ItemXCommand implements CommandExecutor, TabCompleter {
         Player player = (Player) sender;
         
         if (args.length < 2) {
-            sendMessage(sender, "<red>Usage: /itemx get <item-id> or /itemx get category:<category-name>");
+            sendMessage(sender, "<red>Usage: /itemx get category:<category-name>");
             return true;
         }
         
@@ -149,7 +149,8 @@ public class ItemXCommand implements CommandExecutor, TabCompleter {
         if (argument.startsWith("category:")) {
             return handleCategoryGet(player, argument.substring(9));
         } else {
-            return handleSingleItemGet(player, argument);
+            sendMessage(sender, "<red>You can only get items by category. Usage: /itemx get category:<category-name>");
+            return true;
         }
     }
     
