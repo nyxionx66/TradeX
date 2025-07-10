@@ -108,23 +108,13 @@ public final class ProTrades extends JavaPlugin {
     }
 
     /**
-     * Loads the ItemX configuration file.
+     * Loads the ItemX configuration from the main config file.
      */
     private void loadItemXConfig() {
         try {
-            File itemXConfigFile = new File(getDataFolder(), "itemx-config.yml");
-            if (!itemXConfigFile.exists()) {
-                saveResource("itemx-config.yml", false);
-            }
-            
-            // Merge ItemX config with main config
-            org.bukkit.configuration.file.YamlConfiguration itemXConfig = 
-                org.bukkit.configuration.file.YamlConfiguration.loadConfiguration(itemXConfigFile);
-            
-            // Add ItemX configuration to main config
-            getConfig().set("itemx", itemXConfig.getConfigurationSection(""));
-            
-            getLogger().info("ItemX configuration loaded successfully");
+            // ItemX configuration is now integrated into the main config.yml
+            // No separate loading needed - it's already part of the main config
+            getLogger().info("ItemX configuration loaded from main config");
         } catch (Exception e) {
             getLogger().log(Level.WARNING, "Failed to load ItemX configuration", e);
         }
