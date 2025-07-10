@@ -629,7 +629,7 @@ public class GUIManager {
             // Set ingredients (up to 2 ingredients supported by villager trading)
             // Create trading-safe copies of ingredients to preserve NBT data
             if (inputs.size() >= 1 && inputs.get(0) != null && inputs.get(0).getType() != Material.AIR) {
-                ItemStack safeInput1 = ItemUtils.createTradingSafeCopy(inputs.get(0));
+                ItemStack safeInput1 = ItemUtils.createPerfectClone(inputs.get(0));
                 recipe.addIngredient(safeInput1);
                 
                 // Log ProItems information
