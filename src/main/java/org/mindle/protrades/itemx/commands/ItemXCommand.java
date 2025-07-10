@@ -222,19 +222,17 @@ public class ItemXCommand implements CommandExecutor, TabCompleter {
             
             switch (subCommand) {
                 case "give":
-                case "get":
-                    // Second argument: item IDs
+                    // Second argument for give: item IDs
                     completions.addAll(itemManager.getAllItemIds().stream()
                             .filter(id -> id.startsWith(args[1].toLowerCase()))
                             .collect(Collectors.toList()));
-                    
-                    // For get command, also add category options
-                    if ("get".equals(subCommand)) {
-                        completions.addAll(itemManager.getAllCategories().stream()
-                                .map(cat -> "category:" + cat)
-                                .filter(cat -> cat.startsWith(args[1].toLowerCase()))
-                                .collect(Collectors.toList()));
-                    }
+                    break;
+                case "get":
+                    // Second argument for get: only category options
+                    completions.addAll(itemManager.getAllCategories().stream()
+                            .map(cat -> "category:" + cat)
+                            .filter(cat -> cat.startsWith(args[1].toLowerCase()))
+                            .collect(Collectors.toList()));
                     break;
             }
         } else if (args.length == 3 && "give".equals(args[0].toLowerCase())) {
