@@ -1,0 +1,101 @@
+# Endgame trade templates for veteran players
+ultimate_weapon:
+  name: "Ultimate Weapon Forge"
+  description: "Forge the most powerful weapon"
+  category: "endgame"
+  enabled: true
+  inputs:
+    blade1:
+      type: "itemx"
+      item: "legendary_sword"
+      amount: 1
+    blade2:
+      type: "itemx"
+      item: "flaming_blade"
+      amount: 1
+    core:
+      type: "regular"
+      item: "DRAGON_EGG"
+      amount: 1
+    stars:
+      type: "regular"
+      item: "NETHER_STAR"
+      amount: 10
+  output:
+    type: "regular"
+    item: "NETHERITE_SWORD"
+    amount: 1
+    properties:
+      ultimate: true
+      power_level: 1000
+  metadata:
+    difficulty: "legendary"
+    required_level: 20
+
+perfect_armor:
+  name: "Perfect Armor Set"
+  description: "Create the ultimate protection"
+  category: "endgame"
+  enabled: true
+  inputs:
+    helmet:
+      type: "itemx"
+      item: "dragon_helmet"
+      amount: 1
+    chest:
+      type: "itemx"
+      item: "mystical_chestplate"
+      amount: 1
+    essence:
+      type: "regular"
+      item: "TOTEM_OF_UNDYING"
+      amount: 5
+    blocks:
+      type: "regular"
+      item: "NETHERITE_BLOCK"
+      amount: 10
+  output:
+    type: "regular"
+    item: "ELYTRA"
+    amount: 1
+    properties:
+      perfect: true
+      indestructible: true
+  metadata:
+    difficulty: "legendary"
+    required_level: 25
+
+ascension_trade:
+  name: "Player Ascension"
+  description: "Trade for transcendent power"
+  category: "endgame"
+  enabled: false
+  inputs:
+    weapon:
+      type: "itemx"
+      item: "legendary_sword"
+      amount: 1
+    armor:
+      type: "itemx"
+      item: "mystical_chestplate"
+      amount: 1
+    tool:
+      type: "itemx"
+      item: "miners_pickaxe"
+      amount: 1
+    souls:
+      type: "regular"
+      item: "SOUL_LANTERN"
+      amount: 64
+    hearts:
+      type: "regular"
+      item: "ENCHANTED_GOLDEN_APPLE"
+      amount: 32
+  output:
+    type: "itemx"
+    item: "teleport_pearl"
+    amount: 10
+  metadata:
+    difficulty: "mythic"
+    required_level: 50
+    special: "admin_only"
