@@ -8,9 +8,11 @@ import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.mindle.protrades.utils.NBTUtils;
+import org.mindle.protrades.utils.CloningUtils;
 
 import java.util.List;
 import java.util.Map;
+import java.util.ArrayList;
 
 /**
  * Enhanced utility class for item-related operations with full NBT support.
