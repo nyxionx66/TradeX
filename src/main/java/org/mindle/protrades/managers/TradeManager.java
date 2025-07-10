@@ -465,6 +465,7 @@ public class TradeManager {
 
     /**
      * Loads a trade from a configuration section with enhanced NBT support.
+     * Uses the ultra cloning system for maximum data preservation.
      * 
      * @param tradeId The ID of the trade
      * @param section The configuration section
@@ -484,8 +485,8 @@ public class TradeManager {
             for (String inputString : inputStrings) {
                 ItemStack input = configManager.parseItemStack(inputString);
                 if (input != null) {
-                    // Create a trading-safe copy to preserve NBT data
-                    ItemStack safeCopy = ItemUtils.createTradingSafeCopy(input);
+                    // Use ultra cloning system for perfect preservation
+                    ItemStack safeCopy = ItemUtils.createPerfectClone(input);
                     inputs.add(safeCopy);
                     plugin.getLogger().fine("Loaded input item: " + ItemUtils.getNBTSummary(safeCopy));
                 } else {
@@ -504,11 +505,18 @@ public class TradeManager {
                 return null;
             }
             
-            // Create a trading-safe copy of the output to preserve NBT data
-            ItemStack safeOutput = ItemUtils.createTradingSafeCopy(output);
+            // Use ultra cloning system for perfect preservation of the output
+            ItemStack safeOutput = ItemUtils.createPerfectClone(output);
             plugin.getLogger().fine("Loaded output item: " + ItemUtils.getNBTSummary(safeOutput));
             
-            return Trade.of(tradeId, inputs, safeOutput);
+            Trade trade = Trade.of(tradeId, inputs, safeOutput);
+            
+            // Verify trade integrity
+            if (!verifyTradeIntegrity(trade, trade)) {
+                plugin.getLogger().warning("Trade integrity verification failed for: " + tradeId);
+            }
+            
+            return trade;
         } catch (Exception e) {
             plugin.getLogger().log(Level.WARNING, "Error loading trade: " + tradeId, e);
             return null;
