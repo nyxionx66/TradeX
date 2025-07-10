@@ -116,11 +116,6 @@ public final class ProTrades extends JavaPlugin {
         this.tradeManager = new TradeManager(this, configManager);
         this.guiManager = new GUIManager(this, tradeManager);
         
-        // ItemX system managers
-        this.itemManager = new ItemManager(this);
-        this.templateManager = new TradeTemplateManager(this, itemManager);
-        this.tradeCreationGUI = new TradeCreationGUI(this, itemManager);
-        
         getLogger().info("Initialized all managers successfully");
     }
 
