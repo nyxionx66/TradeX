@@ -20,20 +20,32 @@ import java.util.concurrent.Executor;
 import java.util.logging.Level;
 
 /**
- * Manages YML configuration files for trades with full NBT support and trade ordering.
- * Uses Java 21 virtual threads for I/O operations and Base64 serialization for ItemStacks.
+ * Streamlined configuration manager for the new resource structure.
+ * Handles trade configurations and item serialization with improved organization.
  */
 public class ConfigManager {
 
     private final ProTrades plugin;
+    private final File configsDirectory;
     private final File tradesDirectory;
     private final Executor virtualThreadExecutor;
 
     public ConfigManager(ProTrades plugin) {
         this.plugin = plugin;
-        this.tradesDirectory = new File(plugin.getDataFolder(), "trades");
+        this.configsDirectory = new File(plugin.getDataFolder(), "configs");
+        this.tradesDirectory = new File(configsDirectory, "trades");
         this.virtualThreadExecutor = Executors.newVirtualThreadPerTaskExecutor();
         
+        createDirectories();
+    }
+
+    /**
+     * Creates necessary directories for the new structure.
+     */
+    private void createDirectories() {
+        if (!configsDirectory.exists()) {
+            configsDirectory.mkdirs();
+        }
         if (!tradesDirectory.exists()) {
             tradesDirectory.mkdirs();
         }
@@ -50,7 +62,7 @@ public class ConfigManager {
             try {
                 File file = new File(tradesDirectory, tradeId + ".yml");
                 if (!file.exists()) {
-                    return new HashMap<>();
+                    return loadFromExampleTrades(tradeId);
                 }
 
                 FileConfiguration config = YamlConfiguration.loadConfiguration(file);
@@ -70,7 +82,32 @@ public class ConfigManager {
     }
 
     /**
-     * Saves a trade configuration to file asynchronously with full NBT support and trade ordering.
+     * Loads trade configuration from example trades file.
+     */
+    private Map<String, Object> loadFromExampleTrades(String tradeId) {
+        try {
+            File exampleFile = new File(plugin.getDataFolder(), "configs/example_trades.yml");
+            if (!exampleFile.exists()) {
+                return new HashMap<>();
+            }
+
+            FileConfiguration config = YamlConfiguration.loadConfiguration(exampleFile);
+            if (config.contains(tradeId)) {
+                Map<String, Object> result = new HashMap<>();
+                result.put("title", config.getString(tradeId + ".title", "&1&lTrade GUI"));
+                result.put("rows", config.getInt(tradeId + ".rows", 3));
+                result.put("trades", config.getConfigurationSection(tradeId + ".trades"));
+                result.put("order", config.getStringList(tradeId + ".order"));
+                return result;
+            }
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.WARNING, "Error loading example trade: " + tradeId, e);
+        }
+        return new HashMap<>();
+    }
+
+    /**
+     * Saves a trade configuration to file asynchronously.
      * 
      * @param tradeId The ID of the trade to save
      * @param title The GUI title
@@ -88,6 +125,8 @@ public class ConfigManager {
                 
                 config.set("title", title);
                 config.set("rows", rows);
+                config.set("created", System.currentTimeMillis());
+                config.set("version", plugin.getDescription().getVersion());
                 
                 // Save trade order
                 if (order != null && !order.isEmpty()) {
@@ -114,9 +153,14 @@ public class ConfigManager {
                     if (serializedOutput != null) {
                         config.set(tradePath + ".output", serializedOutput);
                     }
+                    
+                    // Save metadata
+                    config.set(tradePath + ".metadata.created", System.currentTimeMillis());
+                    config.set(tradePath + ".metadata.id", entry.getKey());
                 }
                 
                 config.save(file);
+                plugin.getLogger().info("Saved trade configuration: " + tradeId);
                 return true;
             } catch (IOException e) {
                 plugin.getLogger().log(Level.SEVERE, "Error saving trade config: " + tradeId, e);
@@ -140,12 +184,28 @@ public class ConfigManager {
     public List<String> getAllTradeIds() {
         List<String> tradeIds = new ArrayList<>();
         
+        // Load from trades directory
         File[] files = tradesDirectory.listFiles((dir, name) -> name.endsWith(".yml"));
         if (files != null) {
             for (File file : files) {
                 String fileName = file.getName();
                 tradeIds.add(fileName.substring(0, fileName.length() - 4)); // Remove .yml extension
             }
+        }
+        
+        // Load from example trades
+        try {
+            File exampleFile = new File(plugin.getDataFolder(), "configs/example_trades.yml");
+            if (exampleFile.exists()) {
+                FileConfiguration config = YamlConfiguration.loadConfiguration(exampleFile);
+                for (String key : config.getKeys(false)) {
+                    if (!tradeIds.contains(key)) {
+                        tradeIds.add(key);
+                    }
+                }
+            }
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.WARNING, "Error loading example trade IDs", e);
         }
         
         return tradeIds;
@@ -163,7 +223,7 @@ public class ConfigManager {
     }
 
     /**
-     * Creates a default trade configuration file.
+     * Creates a default trade configuration file using templates.
      * 
      * @param tradeId The ID of the trade to create
      * @return CompletableFuture indicating completion
@@ -181,8 +241,12 @@ public class ConfigManager {
                 config.set("rows", 3);
                 config.set("trades", new HashMap<>());
                 config.set("order", new ArrayList<>());
+                config.set("created", System.currentTimeMillis());
+                config.set("version", plugin.getDescription().getVersion());
+                config.set("auto_generated", true);
                 
                 config.save(file);
+                plugin.getLogger().info("Created default trade config: " + tradeId);
                 return true;
             } catch (IOException e) {
                 plugin.getLogger().log(Level.SEVERE, "Error creating default trade config: " + tradeId, e);
@@ -242,8 +306,7 @@ public class ConfigManager {
     }
 
     /**
-     * Legacy method for backward compatibility - attempts to parse old format first,
-     * then falls back to NBT deserialization.
+     * Enhanced method to parse ItemStack from various formats.
      * 
      * @param itemString The string representation of the item
      * @return The parsed ItemStack, or null if parsing failed
@@ -258,13 +321,30 @@ public class ConfigManager {
             return parseLegacyItemStack(itemString);
         }
         
+        // Check if it's an ItemX reference (item_id:amount)
+        if (itemString.contains(":") && plugin.getItemManager() != null) {
+            String[] parts = itemString.split(":");
+            if (parts.length == 2) {
+                try {
+                    int amount = Integer.parseInt(parts[1]);
+                    ItemStack itemxItem = plugin.getItemManager().createItemStack(parts[0]);
+                    if (itemxItem != null) {
+                        itemxItem.setAmount(amount);
+                        return itemxItem;
+                    }
+                } catch (NumberFormatException e) {
+                    // Fall through to other parsing methods
+                }
+            }
+        }
+        
         // Try to deserialize as Base64 NBT data
         ItemStack nbtItem = deserializeItemStack(itemString);
         if (nbtItem != null) {
             return nbtItem;
         }
         
-        // If both fail, try legacy format as fallback
+        // If all else fails, try legacy format
         return parseLegacyItemStack(itemString);
     }
 
@@ -296,13 +376,42 @@ public class ConfigManager {
     }
 
     /**
-     * Converts an ItemStack to a string representation with full NBT support.
-     * Uses Base64 serialization for complete data preservation.
-     * 
-     * @param item The ItemStack to convert
-     * @return String representation of the item with NBT data
+     * Gets the configs directory.
      */
-    private String itemStackToString(ItemStack item) {
-        return serializeItemStack(item);
+    public File getConfigsDirectory() {
+        return configsDirectory;
+    }
+
+    /**
+     * Gets the trades directory.
+     */
+    public File getTradesDirectory() {
+        return tradesDirectory;
+    }
+
+    /**
+     * Validates the configuration structure.
+     */
+    public boolean validateConfiguration() {
+        try {
+            // Check if required directories exist
+            if (!configsDirectory.exists() || !tradesDirectory.exists()) {
+                plugin.getLogger().warning("Required directories missing, creating them...");
+                createDirectories();
+            }
+            
+            // Check if example trades file exists
+            File exampleFile = new File(plugin.getDataFolder(), "configs/example_trades.yml");
+            if (!exampleFile.exists()) {
+                plugin.getLogger().warning("Example trades file not found: " + exampleFile.getPath());
+                return false;
+            }
+            
+            plugin.getLogger().info("Configuration structure validated successfully");
+            return true;
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.SEVERE, "Error validating configuration", e);
+            return false;
+        }
     }
 }
