@@ -154,6 +154,14 @@ public final class ProTrades extends JavaPlugin {
         return itemManager;
     }
 
+    public TradeTemplateManager getTemplateManager() {
+        return templateManager;
+    }
+
+    public TradeCreationGUI getTradeCreationGUI() {
+        return tradeCreationGUI;
+    }
+
     /**
      * Checks if ProItems plugin is installed and enabled.
      */
