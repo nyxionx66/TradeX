@@ -50,6 +50,8 @@ public final class ProTrades extends JavaPlugin {
             
             // Initialize ItemX system
             this.itemManager = new ItemManager(this);
+            this.templateManager = new TradeTemplateManager(this, itemManager);
+            this.tradeCreationGUI = new TradeCreationGUI(this, itemManager);
             
             // Load configurations
             loadItemXConfig();
