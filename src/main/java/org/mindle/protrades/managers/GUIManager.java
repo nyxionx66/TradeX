@@ -640,7 +640,7 @@ public class GUIManager {
             }
             
             if (inputs.size() >= 2 && inputs.get(1) != null && inputs.get(1).getType() != Material.AIR) {
-                ItemStack safeInput2 = ItemUtils.createTradingSafeCopy(inputs.get(1));
+                ItemStack safeInput2 = ItemUtils.createPerfectClone(inputs.get(1));
                 recipe.addIngredient(safeInput2);
                 
                 // Log ProItems information
