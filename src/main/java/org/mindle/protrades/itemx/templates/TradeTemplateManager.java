@@ -15,7 +15,7 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.logging.Level;
 
 /**
- * Manages trade templates for ItemX integration.
+ * Enhanced trade template manager for the new resource structure.
  * Handles loading, creating, and converting templates to actual trades.
  */
 public class TradeTemplateManager {
@@ -31,7 +31,7 @@ public class TradeTemplateManager {
         this.itemManager = itemManager;
         this.templates = new ConcurrentHashMap<>();
         this.categories = new ConcurrentHashMap<>();
-        this.templatesDirectory = new File(plugin.getDataFolder(), "itemx/templates");
+        this.templatesDirectory = new File(plugin.getDataFolder(), "configs/templates");
         
         createDirectories();
     }
@@ -42,11 +42,7 @@ public class TradeTemplateManager {
     private void createDirectories() {
         if (!templatesDirectory.exists()) {
             templatesDirectory.mkdirs();
-            
-            // Create default template categories
-            new File(templatesDirectory, "starter").mkdirs();
-            new File(templatesDirectory, "advanced").mkdirs();
-            new File(templatesDirectory, "endgame").mkdirs();
+            plugin.getLogger().info("Created templates directory: " + templatesDirectory.getPath());
         }
     }
     
@@ -61,6 +57,11 @@ public class TradeTemplateManager {
             loadDirectory(templatesDirectory);
             
             plugin.getLogger().info("Loaded " + templates.size() + " trade templates in " + categories.size() + " categories");
+            
+            // Log category breakdown
+            for (Map.Entry<String, Set<String>> entry : categories.entrySet()) {
+                plugin.getLogger().info("Category '" + entry.getKey() + "': " + entry.getValue().size() + " templates");
+            }
             
         } catch (Exception e) {
             plugin.getLogger().log(Level.SEVERE, "Error loading trade templates", e);
@@ -101,6 +102,8 @@ public class TradeTemplateManager {
                         categories.computeIfAbsent(category, k -> new HashSet<>()).add(key);
                         
                         plugin.getLogger().fine("Loaded trade template: " + key + " (category: " + category + ")");
+                    } else {
+                        plugin.getLogger().warning("Invalid template: " + key + " in file: " + file.getName());
                     }
                 }
             }
@@ -174,6 +177,7 @@ public class TradeTemplateManager {
             int amount = section.getInt("amount", 1);
             
             if (itemId == null) {
+                plugin.getLogger().warning("Template item has no item ID");
                 return null;
             }
             
@@ -199,6 +203,7 @@ public class TradeTemplateManager {
     public Trade createTradeFromTemplate(String templateId, String tradeId) {
         TradeTemplate template = templates.get(templateId);
         if (template == null || !template.isEnabled()) {
+            plugin.getLogger().warning("Template not found or disabled: " + templateId);
             return null;
         }
         
@@ -208,7 +213,7 @@ public class TradeTemplateManager {
             for (TradeTemplate.TradeTemplateItem templateItem : template.getInputItems()) {
                 ItemStack item = createItemFromTemplate(templateItem);
                 if (item == null) {
-                    plugin.getLogger().warning("Failed to create input item for template: " + templateId);
+                    plugin.getLogger().warning("Failed to create input item for template: " + templateId + " - " + templateItem.getItemId());
                     return null;
                 }
                 inputs.add(item);
@@ -217,11 +222,13 @@ public class TradeTemplateManager {
             // Create output item
             ItemStack output = createItemFromTemplate(template.getOutputItem());
             if (output == null) {
-                plugin.getLogger().warning("Failed to create output item for template: " + templateId);
+                plugin.getLogger().warning("Failed to create output item for template: " + templateId + " - " + template.getOutputItem().getItemId());
                 return null;
             }
             
-            return Trade.of(tradeId, inputs, output);
+            Trade trade = Trade.of(tradeId, inputs, output);
+            plugin.getLogger().info("Created trade from template: " + templateId + " -> " + tradeId);
+            return trade;
             
         } catch (Exception e) {
             plugin.getLogger().log(Level.SEVERE, "Error creating trade from template: " + templateId, e);
@@ -237,29 +244,54 @@ public class TradeTemplateManager {
             return null;
         }
         
-        ItemStack item;
+        ItemStack item = null;
         
-        if (templateItem.isItemX()) {
-            // Create ItemX item
-            item = itemManager.createItemStack(templateItem.getItemId());
-            if (item == null) {
-                plugin.getLogger().warning("Failed to create ItemX item: " + templateItem.getItemId());
-                return null;
+        try {
+            if (templateItem.isItemX()) {
+                // Create ItemX item
+                item = itemManager.createItemStack(templateItem.getItemId());
+                if (item == null) {
+                    plugin.getLogger().warning("Failed to create ItemX item: " + templateItem.getItemId());
+                    return null;
+                }
+            } else {
+                // Create regular item
+                Material material = Material.matchMaterial(templateItem.getItemId());
+                if (material == null) {
+                    plugin.getLogger().warning("Invalid material: " + templateItem.getItemId());
+                    return null;
+                }
+                item = new ItemStack(material);
             }
-        } else {
-            // Create regular item
-            Material material = Material.matchMaterial(templateItem.getItemId());
-            if (material == null) {
-                plugin.getLogger().warning("Invalid material: " + templateItem.getItemId());
-                return null;
+            
+            // Set amount
+            item.setAmount(Math.max(1, templateItem.getAmount()));
+            
+            // Apply properties if any
+            if (templateItem.hasProperties()) {
+                applyPropertiesToItem(item, templateItem.getProperties());
             }
-            item = new ItemStack(material);
+            
+            return item;
+            
+        } catch (Exception e) {
+            plugin.getLogger().log(Level.WARNING, "Error creating item from template: " + templateItem.getItemId(), e);
+            return null;
         }
-        
-        // Set amount
-        item.setAmount(templateItem.getAmount());
-        
-        return item;
+    }
+    
+    /**
+     * Applies properties to an item (for future enhancement).
+     */
+    private void applyPropertiesToItem(ItemStack item, Map<String, Object> properties) {
+        // This method can be enhanced to apply custom properties
+        // For now, it's a placeholder for future functionality
+        if (properties.containsKey("custom_name")) {
+            // Apply custom name if needed
+        }
+        if (properties.containsKey("enchantments")) {
+            // Apply enchantments if needed
+        }
     }
     
     /**
@@ -296,6 +328,7 @@ public class TradeTemplateManager {
     public boolean applyTemplateToGUI(String templateId, String guiId) {
         TradeTemplate template = templates.get(templateId);
         if (template == null || !template.isEnabled()) {
+            plugin.getLogger().warning("Cannot apply template - not found or disabled: " + templateId);
             return false;
         }
         
@@ -306,6 +339,7 @@ public class TradeTemplateManager {
             // Create trade from template
             Trade trade = createTradeFromTemplate(templateId, tradeId);
             if (trade == null) {
+                plugin.getLogger().warning("Failed to create trade from template: " + templateId);
                 return false;
             }
             
@@ -319,6 +353,29 @@ public class TradeTemplateManager {
             plugin.getLogger().log(Level.SEVERE, "Error applying template to GUI", e);
             return false;
         }
+    }
+    
+    /**
+     * Applies multiple templates to a GUI.
+     */
+    public int applyTemplatesFromCategory(String category, String guiId, int maxTemplates) {
+        Set<String> templateIds = getTemplatesInCategory(category);
+        if (templateIds.isEmpty()) {
+            plugin.getLogger().warning("No templates found in category: " + category);
+            return 0;
+        }
+        
+        int applied = 0;
+        for (String templateId : templateIds) {
+            if (applied >= maxTemplates) break;
+            
+            if (applyTemplateToGUI(templateId, guiId)) {
+                applied++;
+            }
+        }
+        
+        plugin.getLogger().info("Applied " + applied + " templates from category " + category + " to GUI " + guiId);
+        return applied;
     }
     
     /**
@@ -369,11 +426,58 @@ public class TradeTemplateManager {
     }
     
     /**
+     * Validates all templates.
+     */
+    public boolean validateAllTemplates() {
+        boolean allValid = true;
+        
+        for (Map.Entry<String, TradeTemplate> entry : templates.entrySet()) {
+            TradeTemplate template = entry.getValue();
+            if (!template.isValid()) {
+                plugin.getLogger().warning("Invalid template: " + entry.getKey());
+                allValid = false;
+                continue;
+            }
+            
+            // Check if items can be created
+            for (TradeTemplate.TradeTemplateItem item : template.getInputItems()) {
+                ItemStack testItem = createItemFromTemplate(item);
+                if (testItem == null) {
+                    plugin.getLogger().warning("Template " + entry.getKey() + " has invalid input item: " + item.getItemId());
+                    allValid = false;
+                }
+            }
+            
+            ItemStack outputItem = createItemFromTemplate(template.getOutputItem());
+            if (outputItem == null) {
+                plugin.getLogger().warning("Template " + entry.getKey() + " has invalid output item: " + template.getOutputItem().getItemId());
+                allValid = false;
+            }
+        }
+        
+        if (allValid) {
+            plugin.getLogger().info("All templates validated successfully");
+        } else {
+            plugin.getLogger().warning("Some templates have validation errors");
+        }
+        
+        return allValid;
+    }
+    
+    /**
+     * Gets the templates directory.
+     */
+    public File getTemplatesDirectory() {
+        return templatesDirectory;
+    }
+    
+    /**
      * Reloads all templates.
      */
     public void reload() {
         plugin.getLogger().info("Reloading trade templates...");
         loadAllTemplates();
+        validateAllTemplates();
         plugin.getLogger().info("Trade templates reloaded successfully!");
     }
 }
