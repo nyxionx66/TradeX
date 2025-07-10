@@ -200,8 +200,6 @@ public final class ProTrades extends JavaPlugin {
             reloadConfig();
             
             // Reload all managers
-            itemManager.reload();
-            templateManager.reload();
             tradeManager.loadAllTrades();
             
             // Validate after reload
