@@ -81,7 +81,7 @@ public final class ProTrades extends JavaPlugin {
     }
 
     /**
-     * Creates all required directories for the new structure.
+     * Creates required directories for the trade system.
      */
     private void createDirectories() {
         // Create main directories
@@ -99,26 +99,6 @@ public final class ProTrades extends JavaPlugin {
         File tradesDir = new File(configsDir, "trades");
         if (!tradesDir.exists()) {
             tradesDir.mkdirs();
-        }
-        
-        File templatesDir = new File(configsDir, "templates");
-        if (!templatesDir.exists()) {
-            templatesDir.mkdirs();
-        }
-        
-        // Create items directory structure
-        File itemsDir = new File(dataFolder, "items");
-        if (!itemsDir.exists()) {
-            itemsDir.mkdirs();
-        }
-        
-        // Create category directories
-        String[] categories = {"weapons", "armor", "tools", "misc"};
-        for (String category : categories) {
-            File categoryDir = new File(itemsDir, category);
-            if (!categoryDir.exists()) {
-                categoryDir.mkdirs();
-            }
         }
         
         getLogger().info("Created directory structure successfully");
