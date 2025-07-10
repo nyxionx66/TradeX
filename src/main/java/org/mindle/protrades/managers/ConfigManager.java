@@ -316,26 +316,9 @@ public class ConfigManager {
             return null;
         }
         
-        // Check if it's the old format (MATERIAL:AMOUNT)
+        // Check for simple format (legacy) first
         if (itemString.contains(":") && !itemString.contains("=") && itemString.split(":").length == 2) {
             return parseLegacyItemStack(itemString);
-        }
-        
-        // Check if it's an ItemX reference (item_id:amount)
-        if (itemString.contains(":") && plugin.getItemManager() != null) {
-            String[] parts = itemString.split(":");
-            if (parts.length == 2) {
-                try {
-                    int amount = Integer.parseInt(parts[1]);
-                    ItemStack itemxItem = plugin.getItemManager().createItemStack(parts[0]);
-                    if (itemxItem != null) {
-                        itemxItem.setAmount(amount);
-                        return itemxItem;
-                    }
-                } catch (NumberFormatException e) {
-                    // Fall through to other parsing methods
-                }
-            }
         }
         
         // Try to deserialize as Base64 NBT data
