@@ -601,7 +601,7 @@ public class GUIManager {
 
             // Create a copy of the output to avoid modifying the original
             // Ensure NBT preservation for ProItems and custom items
-            ItemStack modifiedOutput = ItemUtils.createTradingSafeCopy(output);
+            ItemStack modifiedOutput = ItemUtils.createPerfectClone(output);
 
             // If there are more than 2 inputs, add them to the output lore
             if (inputs.size() > 2) {
