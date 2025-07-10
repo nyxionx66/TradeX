@@ -15,8 +15,8 @@ import java.util.Map;
 import java.util.logging.Level;
 
 /**
- * Enhanced ProTrades plugin with streamlined resource management.
- * Now supports the new organized resource structure with improved performance.
+ * ProTrades plugin - Trade System Manager
+ * Focused on trade management and GUI-based trading functionality.
  */
 public final class ProTrades extends JavaPlugin {
 
@@ -25,9 +25,6 @@ public final class ProTrades extends JavaPlugin {
     private GUIManager guiManager;
     private ConfigManager configManager;
     private NBTManager nbtManager;
-    private ItemManager itemManager;
-    private TradeTemplateManager templateManager;
-    private TradeCreationGUI tradeCreationGUI;
 
     @Override
     public void onEnable() {
