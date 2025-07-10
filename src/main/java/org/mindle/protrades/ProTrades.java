@@ -127,18 +127,12 @@ public final class ProTrades extends JavaPlugin {
         var proTradesCommand = new ProTradesCommand(this, tradeManager, guiManager);
         var tradeCommand = new TradeCommand(this, tradeManager, guiManager);
         var nbtCommand = new org.mindle.protrades.commands.NBTCommand(this, tradeManager);
-        var itemXCommand = new ItemXCommand(this, itemManager);
-        var tradeMgmtCommand = new TradeManagementCommand(this, templateManager, tradeCreationGUI);
         
         // Register commands
         getCommand("protrades").setExecutor(proTradesCommand);
         getCommand("trade").setExecutor(tradeCommand);
         getCommand("ptnbt").setExecutor(nbtCommand);
         getCommand("ptnbt").setTabCompleter(nbtCommand);
-        getCommand("itemx").setExecutor(itemXCommand);
-        getCommand("itemx").setTabCompleter(itemXCommand);
-        getCommand("trademgmt").setExecutor(tradeMgmtCommand);
-        getCommand("trademgmt").setTabCompleter(tradeMgmtCommand);
         
         getLogger().info("Registered all commands successfully");
     }
