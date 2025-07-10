@@ -301,6 +301,7 @@ public class ItemUtils {
 
     /**
      * Creates a copy of an ItemStack with a new amount while preserving all NBT data.
+     * Uses the ultra cloning system for maximum data preservation.
      * 
      * @param original The original ItemStack
      * @param newAmount The new amount
@@ -311,9 +312,8 @@ public class ItemUtils {
             return null;
         }
         
-        ItemStack copy = original.clone();
-        copy.setAmount(newAmount);
-        return copy;
+        // Use ultra cloning system for perfect preservation
+        return CloningUtils.ultraCloneWithAmount(original, newAmount);
     }
 
     /**
