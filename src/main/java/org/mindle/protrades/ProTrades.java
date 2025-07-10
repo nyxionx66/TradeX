@@ -79,9 +79,12 @@ public final class ProTrades extends JavaPlugin {
             // Load all trades and items
             tradeManager.loadAllTrades();
             itemManager.loadAllItems();
+            templateManager.loadAllTemplates();
 
             getLogger().info("ProTrades has been enabled successfully with NBT support!");
             getLogger().info("ItemX system: ENABLED");
+            getLogger().info("Trade Templates: ENABLED");
+            getLogger().info("Dynamic Trade Creation: ENABLED");
             getLogger().info("ProItems integration: " + (isProItemsInstalled() ? "ENABLED" : "DISABLED"));
         } catch (Exception e) {
             getLogger().log(Level.SEVERE, "Failed to enable ProTrades", e);
